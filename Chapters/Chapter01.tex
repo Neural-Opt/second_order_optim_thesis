@@ -1,0 +1,1209 @@
+%************************************************
+\chapter{Theoretical foundations}\label{ch:introduction}
+%************************************************
+
+\section{Foundations of Differential Calculus}
+\label{sec:foundationcalc}
+
+
+In this section, we explore the fundamental concept of the derivative.
+In mathematics, a derivative measures the rate at which a function changes as its input changes. 
+Simply put, it represents the slope of the tangent line to the function's graph at any given point. 
+For a function $f(x) $ of a single variable $ x $, the derivative is often written as $ f'(x)$  or $\frac{df}{dx} $,
+and it quantifies how much the function changes with a small change in $ x $.
+
+\subsection{Derivatives for Functions of a Single Variable}
+\label{sec:derivative}
+
+Let $ f: \mathbb{R} \to \mathbb{R} $ be a single-variable function. The derivative of the function $ f $ at a point $x$ denoted as $ f'(x) $, is defined as
+\begin{align}
+    f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \quad h \in \mathbb{R}.
+\end{align}
+\subsection{Partial Derivatives}
+\label{sec:partial_derivative}
+
+
+Consider a function $ f: \mathbb{R}^n \to \mathbb{R} $.
+The partial derivative of $f$ with respect to the variable $ x_i $ at a point $ \mathbf{x} = (x_1, x_2, \ldots, x_n)$ is defined as
+\begin{align}
+ \frac{\partial f}{\partial x_i}(\mathbf{x}) = \lim_{h \to 0} \frac{f(x_1, \ldots, x_i+h, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}, \quad h \in \mathbb{R}.
+\end{align}
+
+Assuming this limit exists, this definition encapsulates how $f$ responds to infinitesimal changes in $x_i$, while keeping its other variables fixed.
+
+\subsection{The Gradient}
+\label{sec:gradient}
+
+Let \( f: \mathbb{R}^n \to \mathbb{R} \) be a function  that is differentiable at a point $ \mathbf{x} $.
+Than the gradient of $ f $ at $ \mathbf{x} \in \mathbb{R}^n$, that is denoted as $ \nabla f(\mathbf{x}) $, is the vector of all its first partial derivatives
+\begin{align}
+\nabla f(\mathbf{x}) = \left( \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n} \right) \quad \mathbf{x} \in \mathbb{R}^n.
+\end{align}
+The gradient vector points in the direction of the greatest rate of increase of the function, and its magnitude represents the rate of change in that direction~\cite{bachman2007}.
+
+
+\subsection{The Jacobian Matrix}
+\label{sec:jaocobian}
+
+Let $ \mathbf{f}: \mathbb{R}^n \to \mathbb{R}^m $ be a vector-valued function.
+The Jacobian matrix \( \mathbf{J_f} \) of \( \mathbf{f} \) is an \( m \times n \) matrix that contains all first-order partial derivatives of the component functions \( f_i \) with respect to the input variables \( x_j  \in \mathbb{R} \), where $1 \leq i \leq m$, $1 \leq j \leq n$. It is defined as follows
+
+\begin{align}
+\mathbf{J_f} = \begin{bmatrix}
+\frac{\partial f_1}{\partial x_1} & \frac{\partial f_1}{\partial x_2} & \cdots & \frac{\partial f_1}{\partial x_n} \\
+\frac{\partial f_2}{\partial x_1} & \frac{\partial f_2}{\partial x_2} & \cdots & \frac{\partial f_2}{\partial x_n} \\
+\vdots & \vdots & \ddots & \vdots \\
+\frac{\partial f_m}{\partial x_1} & \frac{\partial f_m}{\partial x_2} & \cdots & \frac{\partial f_m}{\partial x_n}
+\end{bmatrix}.
+\end{align}
+
+
+Each element \( \frac{\partial f_i}{\partial x_j} \) of the Jacobian matrix represents the partial derivative of the \( i \)-th component function \( f_i \) with respect to the \( j \)-th input variable \( x_j \).
+Later, we will see that the Jacobian matrix plays a crucial role in the backpropagation algorithm used for optimizing neural networks.
+\subsection{The Hessian Matrix}
+\label{sec:hessian}
+
+Suppose \( f: \mathbb{R}^n \to \mathbb{R} \) is function that is an at least twice differentiable and takes as input a vector \( \mathbf{x} \in \mathbb{R}^n \) and 
+outputs a scalar \( f(\mathbf{x}) \in \mathbb{R} \). Then the Hessian matrix \( \mathbf{H} \) of \( f \) is given by
+
+\begin{align}
+    \label{eq:hessian}
+    \mathbf{H}_f(\mathbf{x}) = \begin{bmatrix}
+    \frac{\partial^2 f}{\partial x_1^2} & \frac{\partial^2 f}{\partial x_1 \partial x_2} & \cdots & \frac{\partial^2 f}{\partial x_1 \partial x_n} \\
+    \frac{\partial^2 f}{\partial x_2 \partial x_1} & \frac{\partial^2 f}{\partial x_2^2} & \cdots & \frac{\partial^2 f}{\partial x_2 \partial x_n} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    \frac{\partial^2 f}{\partial x_n \partial x_1} & \frac{\partial^2 f}{\partial x_n \partial x_2} & \cdots & \frac{\partial^2 f}{\partial x_n^2}
+    \end{bmatrix}.
+\end{align}
+\emph{Schwarz's Theorem} states states the following: Let \( U \subseteq \mathbb{R}^n \) be an open set and \( f \colon U \to \mathbb{R} \) be at least \( k \)-times partially differentiable.
+If all \( k \)-th partial derivatives in \( U \) are at least continuous, then \( f \) is \( k \)-times totally differentiable.
+In particular, the order of differentiation in all \( l \)-th partial derivatives with \( l \leq k \) is irrelevant. \cite{arens2011mathematik} \\
+We can therefore conclude that \( \mathbf{H} \) is in fact a symmetric real-valued $n\times n$ matrix, meaning \( \mathbf{H} = \mathbf{H}^T \).\\
+\subsubsection{Eigenvalues of the Hessian}
+Because \( \mathbf{H} \) is symmetric, there exist $n$ lineraly independent eigenvectors,
+such that \( \mathbf{H} \) can be factorized as
+\begin{align}
+    \mathbf{H} =  \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^{-1}
+\end{align}
+where $\mathbf{Q} $ is an n × n matrix whose $i$th column is the eigenvector $q_i$ of $ \mathbf{H}$, and $\mathbf{\Lambda}$ is a diagonal matrix whose elements are the corresponding eigenvalues~\cite{kashyap2023survey}.\\
+The eigenvalues of the Hessian matrix play a crucial role in numerical optimization as they provide unique insight into the curvature of the function at a given point.\\
+For example, a given point is a local minimizer if all $\lambda_i > 0$ or a local maximizer if all $\lambda_i < 0$. If there exist eigenvalues of
+different sign, than a given point presents a saddle point which are particularly challenging in the context of machine learning as optimizers as SGD often times get stuck at these regions~\cite{bottou2018optimization}. \\\\
+\subsubsection{Matrix definiteness}
+\label{sec:matrix_definiteness}
+Let $ \mathbf{M}$  be an $n \times n$ symmetric real matrix with  $n \in \mathbb{R}$, than the following statements hold:  
+\[
+M \text{ is positive-definite} \quad \iff \quad \mathbf{x}^{\operatorname{T}} M \mathbf{x} > 0 \text{ for all } \mathbf{x} \in \mathbb{R}^n \setminus \{ \mathbf{0} \}
+\]
+\[
+M \text{ is positive semi-definite} \quad \iff \quad \mathbf{x}^{\operatorname{T}} M \mathbf{x} \geq 0 \text{ for all } \mathbf{x} \in \mathbb{R}^n
+\]
+\[
+M \text{ is negative-definite} \quad \iff \quad \mathbf{x}^{\operatorname{T}} M \mathbf{x} < 0 \text{ for all } \mathbf{x} \in \mathbb{R}^n \setminus \{ \mathbf{0} \}
+\]
+\[
+M \text{ is negative semi-definite} \quad \iff \quad \mathbf{x}^{\operatorname{T}} M \mathbf{x} \leq 0 \text{ for all } \mathbf{x} \in \mathbb{R}^n
+\]\\
+Additionally we define the positive semi-definite order of matrices by $A \preceq B \Longleftrightarrow x^T (B - A) x \geq 0 \quad \forall x \in \mathbb{R}^n$,
+were $ A,B \in \mathbb{R}^{n \times n}$ are symmetric matrices.
+
+%Consider $ M \mathbf{x} = \lambda \mathbf{x} $ for a proof. Multiply both sides by $ \mathbf{x}^T $:
+%\[
+%\Rightarrow \mathbf{x}^T M \mathbf{x} = \lambda \mathbf{x}^T \mathbf{x}
+%\]
+%Since $ \mathbf{x}^T \mathbf{x} = \| \mathbf{x} \|^2 > 0 $, the $ \lambda $s determine the sign \cite{strang2022introduction}.
+\subsubsection{Singular Matrix }
+
+Let $ \mathbf{M}$  be an $n \times n$ symmetric matrix with  $n \in \mathbb{R}$, then $ \mathbf{M}$ is called \emph{singular} if and only if it's determinant is $0$. Therefore $\mathbf{M}^{-1}$ does not exist, meaning $ \mathbf{M}$ does not have an inverse.\\\\  
+\subsubsection{Ill-conditioned Matrices}
+A matrix $\mathbf{M} \in \mathcal{R}^{n\times m}$ is called \emph{ill-conditioned} when its \emph{condition number} is high.
+This implies that small changes in its input (or elements) result in disproportionately large changes in its output.
+The condition number of a matrix $M$, is defined as 
+\begin{align}
+    \kappa(M) = \frac{\sigma_{\max}(M)}{\sigma_{\min}(M)},
+    \end{align}
+where $\sigma_{\max}$ and $\sigma_{\min}$ are the largest and smallest singular values (square roots of non-negative eigenvalues \cite{SZABO2015320}) of $M$ respectively.
+$M$ is called \emph{ill-conditioned} if $\kappa(M) \gg 1$.
+\cite{strang2022introduction}.
+\section{Introduction to Optimization}
+\label{sec:optimization}
+
+Optimization is a crucial tool used in nearly all areas of decision science, engineering, economics, machine learning, and physical sciences \cite{nocedal2006numerical}.
+The process of optimization begins by identifying an objective, which is a measurable indicator of the performance of a model or system. 
+Common objectives in optimization often involve maximizing or minimizing quantities like profit, cost, or time.
+These objectives depend on system characteristics known as variables or parameters.
+The goal of optimization is to identify the values of the set of variables or parameters that minimize or maximize a given objective.
+The parameters often face some constraints, that are necessary to arrive at a practical solution.
+Examples for this might be the non-negativity of the interest rate on a loan or the electron
+density in a molecule.\cite{nocedal2006numerical}
+The process of building such an objective-(function), choosing its parameters and constraints is called \emph{modelling}.
+Constructing an effective model is often the most important step in solving a given problem.
+If the model is too simple, it might not capture the core of the problem.
+On the other hand, if it's overly complex, it may lead to difficult-to-compute solutions and become prone to issues like \emph{overfitting},
+which will be covered in later sections. \\\\
+\marginpar{\cite{nocedal2006numerical}}
+Mathematically, a model and its constraints may be defined as follows
+\[
+\min_{\mathbf{x} \in \mathbb{R}^{n}} f(\mathbf{x}) \quad \text{subject to} \quad
+c_i(\mathbf{x}) = 0, \, i \in \mathcal{E}, \quad
+c_i(\mathbf{x}) \geq 0, \, i \in \mathcal{I}.
+\]
+In this example model we want to minimize the scalar-valued objective function $f$ given a vector of variables or parameters $\mathbf{x}$,
+where $\mathbf{x}$ has to satisfy the scalar-valued constraint functions $c_i$, with sets of indices $\mathcal{E}$ and $\mathcal{I}$.
+
+The set of parameters that serve as optimal solutions to a given model are often denoted as $\mathbf{x^*}$.
+Depending on whether the problem involves maximization or minimization, these parameters are also referred to as maximizers or minimizers, respectively.
+Once the model has been formulated, an optimization algorithm can be used to
+find its solution, usually with the help of a computer~\cite{nocedal2006numerical}. 
+The choice of an optimization algorithm heavily relies on the model's characteristics.
+Factors like linearity, differentiability, convexity, and dimensionality influence whether methods like simplex (for linear models)
+or gradient descent (for differentiable non-linear models) are suitable.\cite{sun2019survey}.\\
+In this work, we focus on \emph{unconstrained nonlinear } optimization problems, which involve finding the optimal values of a nonlinear objective function 
+without explicit constraints on the variables.
+These types of problems are the most frequently encountered in modern machine learning models, particularly in the realm of deep learning \cite{Goodfellow-et-al-2016}.
+For these nonlinear optimization problems, we often differentiate between \emph{first-order} and \emph{second-order} optimization techniques.
+First-order methods, like (stochastic) gradient descent, use only the gradient information of the loss landscape to guide their search for
+a local \emph{minimizer} of the objective function~\cite{kashyap2023survey},
+while second-order methods, such as Newton's method, utilize both the gradient and the Hessian matrix to better approximate the curvature,
+leading to more efficient optimization but with increased computational cost~\cite{yao2021adahessian}.
+In the following sections, we explore various optimization algorithms within first- and second-order techniques,
+highlighting their strengths and weaknesses.
+We also provide a foundational overview of neural networks, focusing on how these optimization strategies are applied to train them. 
+
+
+\section{First-order Optimization Algorithms}
+\label{sec:firstorder}
+
+First-order methods are optimization techniques that rely on gradient information to guide the search for a function's minimum or maximum.
+They are termed "first-order" because they only use first derivatives \ref{sec:gradient} to update parameters.
+They are computationally efficient and work well with large-scale problems, especially in machine learning \cite{Goodfellow-et-al-2016}.
+\subsection{Gradient Descent}
+Gradient descent (GD) is one of the most established first-order optimization algorithms. GD iteratively adjusts model
+parameters to minimize a given loss function by following the negative gradient direction \cite{toussain2014gradient}.
+Since the gradient is a vector indicating the direction of steepest ascent of the loss function, adjusting the parameters in the direction
+of the negative gradient will result in a decrease in the function's value~\cite{toussain2014gradient}.\\
+Formely we write:\\
+\noindent
+Let \( \mathcal{L} : \mathbb{R}^d \to \mathbb{R} \) be a differentiable function, such that \(\textbf{arg min } \mathcal{L}  \neq \emptyset \).  
+Let \( \theta_0 \in \mathbb{R}^d \) and \( \gamma > 0 \) be a step size.  
+\emph{The Gradient Descent (GD)} algorithm defines a sequence \( (\theta_t)_{t \in \mathbb{N}} \) satisfying:
+\begin{align}
+\theta_{t+1} = \theta_t - \gamma \nabla \mathcal{L}(x_t).
+\end{align}
+The step size, denoted as $\gamma$, is often called the \emph{learning rate} and is a crucial hyperparameter when training a model.
+An incorrect choice of $\gamma$ can yield significantly different outcomes: if too large, the step size may overshoot the minimum, resulting in oscillation or divergence;
+if too small, progress will be slow, requiring many iterations to reach convergence. \cite{wu2020wngrad} 
+
+
+\subsection{Empirical Risk Minimization (ERM)}
+\label{sec:erm}
+
+\marginpar{\cite{bottou2018optimization}}
+In machine learning, optimization problems naturally arise due to the formulation of prediction models and the associated loss functions.
+These are typically used to evaluate measures like the expected and \emph{empirical risk}, which practitioners aim to minimize \cite{bottou2018optimization}.
+To formalize this, let's define a family of model functions for some given \( f(\cdot; \cdot) : \mathbb{R}^{d_x} \times \mathbb{R}^d \to \mathbb{R}^{d_y} \) as follows:
+\begin{align}
+\mathbb{F} := \{ f(\cdot; \theta) : \theta \in \mathbb{R}^d \}.
+\end{align}
+
+\marginpar{\cite{bottou2018optimization}}
+The set \(\mathbb{F}\) represents a collection of functions parameterized by a parameter vector \( w \) that determine the prediction functions in use.
+Now assume a loss function \( l : \mathbb{R}^{d_y} \times \mathbb{R}^{d_y} \to \mathbb{R} \), which, given an input-output pair \((x, y)\), yields the loss \( l(f(x; w), y) \).
+The most gratifying behavior for such a prediction function is to minimize the expected loss between any input-output pair.
+For that, let's assume that losses are measured with respect to a probability distribution $P(x,y)$ with $ P : \mathbb{R}^{d_x} \times \mathbb{R}^{d_y} \to [0, 1] $,
+then we could write the expected loss as
+\begin{align}
+R(\theta) = \int_{\mathbb{R}^{d_x} \times \mathbb{R}^{d_y}} l(f(x; \theta), y) dP(x, y) = \mathbb{E}[l(f(x; \theta), y)].
+\end{align}
+
+Where $R(\theta)$ is also called the \emph{expected risk} of a model $f$ given the parameter vector $\theta$. 
+\marginpar{\cite{bottou2018optimization}}
+Minimization of $R(\theta)$ would ensure that the expected loss for the resulting model $f(\cdot; w) $ over all possible $(x, y)$ is minimal.\\
+In practice, however, this is unfeasible when one lacks complete information about $P$.
+Instead, one seeks to solve a problem by estimating \( R \).
+In supervised learning, a set of \( n \in \mathbb{N} \) independently drawn input-output
+samples \(\{ (x_i, y_i) \}_{i=1}^{n} \subseteq \mathbb{R}^{d_x} \times \mathbb{R}^{d_y}\) is typically available.
+In machine learning specifically, we refer to this set of data as the training data.
+From these samples, the \emph{empirical risk} function \( R_n : \mathbb{R}^d \to \mathbb{R} \) is defined as:
+\begin{align}
+R_n(\theta) = \frac{1}{n} \sum_{i=1}^{n} l(f(x_i; \theta), y_i)
+\end{align}
+where \( l \) is the loss function that measures the discrepancy between the prediction \( f(x_i; \theta) \) and the actual output \( y_i \).
+In standard gradient descent, it is actually this \emph{empirical risk} function we strive to minimize, leading to the following gradient update step:
+\begin{align}
+    \theta_{t+1} = \theta_t - \gamma \nabla R_n(\theta_t).
+\end{align}
+
+The gradient descent algorithm continues to iterate through this update step until a convergence criterion is met, such as a maximum number of iterations or an acceptable error tolerance.
+\subsection{Stochastic Gradient Descent}
+\label{sec:sgd}
+
+\marginpar{\cite{stanfordSGD}}
+
+Since standard gradient descent requires the evaluation of the gradient over the whole set of training data, large training sets can quickly become 
+computationally expensive.
+Another issue with standard gradient descent optimization methods is that they don’t give an easy way to incorporate new data in an 'online' setting.
+ Stochastic Gradient Descent (SGD) addresses both of these issues by following the negative gradient of the objective after seeing only a single or a few training examples.
+ Therefore approximating the true gradient of $ R_n(\theta_t)$ by the gradient of a single or a few data points.
+\begin{align}
+{\nabla} R_b(\theta) = \frac{1}{|B|} \sum_{i \in B} \nabla  l(f(x_i; \theta), y_i),
+\end{align}
+    with $B \in \mathbb{N}$ beeing the sample size or \emph{batch size}.
+ Leading to the following update rule \cite{stanfordSGD}
+ \begin{align}
+    \theta_{t+1} = \theta_t - \gamma  {\nabla} R_b(\theta).
+\end{align}
+\marginpar{\cite{garrigos2024handbook}}
+It can be shown that, this estimate $\nabla R_b(\theta)$ provides an unbiased estimator of the true gradient, satisfying
+\begin{align}
+\mathbb{E}[{\nabla} R_b(\theta)] = \nabla R_n(\theta).
+\end{align}
+While this introduces noise into the gradient estimates, repeated updates over many mini-batches allow SGD to approximate the true gradient descent path.
+\subsection{Momentum}
+\label{sec:momentum}
+
+\marginpar{\cite{Goodfellow-et-al-2016}}
+
+While Stochastic Gradient Descent (SGD) is a very effective algorithm for optimization,
+its convergence rates can often be slow. To tackle the problem of slow convergence,
+the method of momentum \cite{polyak1964some} was introduced. Momentum has the benefit of
+leading to faster convergence even in settings with high curvature or noisy gradients \cite{Goodfellow-et-al-2016}.
+The momentum algorithm introduces an additional variable $v$, called the \emph{velocity},
+which defines the direction and speed at which the parameters move through parameter space \cite{Goodfellow-et-al-2016}.
+The update rule for SGD with momentum is given by
+\[    v_t = \beta v_{t-1} + (1 - \beta) \nabla_{\theta} J(\theta_t), \]
+\[     \theta_{t+1} = \theta_t - \eta v_t .\]
+
+where
+\begin{itemize}
+    \item $v_t$ is the velocity vector at iteration $t$,
+    \item $\beta \in [0, 1) $ is the momentum term, typically set between 0.9 and 0.99,
+    \item $\nabla_{\theta} J(\theta_t)$ is the gradient of the loss function at iteration $t$.
+\end{itemize}
+\marginpar{\cite{Goodfellow-et-al-2016}}
+The hyperparameter $\beta$ determines how quickly the contributions of previous gradients
+exponentially decay. Therefore, the larger $\beta$ is, the more previous gradients affect
+the next update direction. With this exponentially weighted summation, we can avoid the gradient successively changing sign
+and jumping around, because the moving average smooths out the updates by considering the influence of past gradients.
+This results in a more stable and consistent direction of the gradient descent~\cite{Goodfellow-et-al-2016}.
+
+\subsection{RMSProp}
+\label{sec:rmsprop}
+
+\marginpar{\cite{Goodfellow-et-al-2016}}
+RMSProp (\emph{Root Mean Square Propagation}) \cite{hintonrms} is an adaptive learning rate optimization algorithm that adjusts the learning rate
+for each parameter based on the magnitude of recent gradients.
+It works by maintaining an exponential moving average of the past squared gradients to obtain curvature information. The scalar learning rate
+then gets divided by this moving average and the resulting vector is mulplied with the current gradient.
+This results in a parameter wise scaling of the learning rate, increasing it in low and
+decreasing in high curvature regions.
+This helps to stabilize the training process and reduce oscillations \cite{Goodfellow-et-al-2016}. The RMSProp update rules are given by:\marginpar{\cite{Goodfellow-et-al-2016}}
+
+\[v_t = \beta v_{t-1} + (1 - \beta) \nabla_{\theta} J(\theta_t)^2,\]
+\[\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{v_t + \epsilon}} \nabla_{\theta} J(\theta_t),\]
+
+where
+\begin{itemize}
+    \item $v_t$ is the exponentially weighted moving average of the squared gradients at time step $t$,
+    \item $\beta \in [0, 1) $ is the decay rate, typically set to around 0.9,
+    \item $\eta$ is the learning rate,
+    \item $\nabla_{\theta} J(\theta_t)$ is the gradient of the loss function at iteration $t$,
+    \item $\epsilon$ is a small constant (e.g., $10^{-8}$) to prevent division by zero.
+\end{itemize}
+
+\subsection{Adam}
+\label{sec:adam}
+
+\marginpar{\cite{d2l2023adam}}
+
+Adam (\emph{Adaptive Momentum})~\cite{kingma2017adam} is one of the most well known and popular
+optimization algorithms for neural networks today. It builds upon the ideas of Momentum and
+adaptive scaling of the learning rate, as it combines both the ideas of Momentum and RMSProp.
+Adam calculates an exponential moving average not only from the gradients, but also the squared gradients.
+It therefore introduces two hyperparameters $\beta_1 \in [0,1)$ and $\beta_2 \in [0,1)$ which determine the
+influence of past (squared) gradients into the moving average
+\[m_t = \beta_1 m_{t-1} + (1 - \beta_1) \nabla_{\theta} J(\theta_t), \]
+\[v_t = \beta_2 v_{t-1} + (1 - \beta_2) \nabla_{\theta} J(\theta_t)^2, \]
+\[\hat{m}_t = \frac{m_t}{1-\beta_1^t}, \]
+\[\hat{v}_t = \frac{v_t}{1-\beta_2^t}, \]
+\[\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v_t} + \epsilon}} \hat{m_t}, \]
+
+where
+\begin{itemize}
+    \item $m_t$ is the velocity vector at iteration $t$,
+    \item $v_t$ is the exponentially weighted moving average of the squared gradients at time step $t$,
+    \item $\beta_1 \in [0, 1) $ is the decay rate, used for the first order moment,
+    \item $\beta_2 \in [0, 1) $ is the decay rate,  used for the second order moment,
+    \item $\hat{m}_t$ is the bias corrected first order moment at $t$,
+    \item $\hat{v}_t$ is the bias corrected second order moment at $t$,
+    \item $\eta$ is the learning rate,
+    \item $\nabla_{\theta} J(\theta_t)$ is the gradient of the loss function at iteration $t$,
+    \item $\epsilon$ is a small constant (e.g., $10^{-8}$) to prevent division by zero.
+\end{itemize}
+As we can see, the Adam algorithm is very similar to RMSProp, with the exception that it
+uses a first-order moment estimate ($m_t$) in addition to the second-order moment estimate
+($v_t$). Unlike RMSProp, which directly uses the current gradient
+ $\nabla_{\theta} J(\theta_t)$, Adam incorporates bias-corrected estimates to improve the
+stability of the training process.
+Adam initializes $m_0 = 0$ and $v_0 = 0$. Consequently, $m_t$ and $v_t$ are biased towards
+zero, especially when the decay rates $\beta_1$ and $\beta_2$ are close to 1 \cite{d2l2023adam}. This bias
+can lead to very large step sizes in the early stages of training.\cite{Goodfellow-et-al-2016} To counteract this,
+Adam applies bias correction by dividing $m_t$ and $v_t$ by $(1 - \beta_1^t)$ and
+$(1 - \beta_2^t)$, respectively, ensuring that the gradients at earlier steps are
+accurately represented \cite{d2l2023adam}.
+
+\subsection{AdaBelief}
+\label{sec:adabelief}
+
+\marginpar{\cite{zhuang2020adabeliefoptimizeradaptingstepsizes}}
+
+AdaBelief \cite{zhuang2020adabeliefoptimizeradaptingstepsizes} is a novel optimizer that builds
+upon the Adam algorithm. The core concept of AdaBelief is to adapt the step size based on the
+"belief" in the current gradient direction. This "belief" is derived from the proximity of the
+current gradient estimate to the exponential moving average of past gradients, denoted as $m_t$.
+If the current gradient estimate is close to $m_t$, we have a higher confidence in the gradient
+estimate and take a larger step in the proposed direction. Conversely, if the current gradient
+estimate significantly deviates from $m_t$, we take a much smaller step.
+
+This adaptive mechanism is achieved by using the squared difference between the gradient
+and the exponential moving average, rather than the gradient itself, in the calculation of the
+second moment estimate $v_t$ \cite{zhuang2020adabelief}
+
+
+
+\[m_t = \beta_1 m_{t-1} + (1 - \beta_1) \nabla_{\theta} J(\theta_t),\]
+\[s_t = \beta_2 s_{t-1} + (1 - \beta_2) (\nabla_{\theta} J(\theta_t) - m_t)^2 + \epsilon,\]
+\[\hat{m}_t = \frac{m_t}{1-\beta_1^t},\]
+\[\hat{s}_t = \frac{s_t}{1-\beta_2^t},\]
+\[\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{s_t} + \epsilon}} \hat{m_t},\]
+
+where
+\begin{itemize}
+    \item $m_t$ is the velocity vector at iteration $t$,
+    \item $s_t$ is the exponentially weighted moving average of the squared difference of the gradient and $m_t$ at time step $t$,
+    \item $\beta_1 \in [0, 1) $ is the decay rate, used for the first order moment,
+    \item $\beta_2 \in [0, 1) $ is the decay rate,  used for the second order moment,
+    \item $\hat{m}_t$ is the bias-corrected first order moment at $t$,
+    \item $\hat{s}_t$ is the bias-corrected second order moment at $t$,
+    \item $\eta$ is the learning rate,
+    \item $\nabla_{\theta} J(\theta_t)$ is the gradient of the loss function at iteration $t$,
+    \item $\epsilon$ is a small constant (e.g., $10^{-8}$) to prevent division by zero.
+\end{itemize}
+Following this approach, AdaBelief achieves fast convergence, training stability, and good generalization results, comparable to Stochastic Gradient Descent (SGD)~\cite{zhuang2020adabelief}.
+
+
+ \section{Second-order Optimization Algorithms}
+ \label{sec:secondorder}
+This section examines optimization algorithms utilizing second-order information, particularly the Hessian matrix (Equation \ref{eq:hessian}). 
+We begin by examining the classical \emph{Newton method}, which serves as a foundation for understanding the motivation
+for approximating the Hessian matrix in subsequent algorithms. Our discussion then progresses to established
+second-order optimization methods, including the popular Broyden-Fletcher-Goldfarb-Shanno (\emph{BFGS}\cite{BFGS})
+and Davidon-Fletcher-Powell (\emph{DFP}\cite{Goodfellow-et-al-2016}) quasi-Newton algorithms. We then shift our analysis to recent advancements in the field
+like \emph{AdaHessian}\cite{yao2021adahessian} and \emph{Apollo}\cite{apollo}, which are algorithms for Hessian diagonal approximation, that are particularly useful in the context of neural network optimization.
+Given their central role in this work, we provide a more comprehensive examination of \emph{AdaHessian} and \emph{Apollo} compared to the other algorithms discussed.
+ \subsection{The Newton method}
+ \label{sec:newton}
+
+\emph{Newton's method} forms the basis of second-order optimization algorithms that aims to find the local minimum or maximum of a differentiable function by iteratively improving an initial estimate. 
+The basic idea is to use a Taylor series expansion to approximate the function by a paraboloid at a given point.
+The algorithm then identifies the minimum of this paraboloid, which provides a direction vector that can guide subsequent algorithms,
+such as line search, towards a local minimum or maximum.In the following we will express this mathematically.\\
+Let $f$ be the function we wish to optimize. 
+Suppose \( f: \mathbb{R}^n \to \mathbb{R} \) is continuously differentiable and that $\Delta x \in \mathbb{R}^n$ then we have
+that
+\label{eq:taylor}
+\begin{equation}
+    f(x+\Delta x ) = f(x) + \nabla f(x)^T\Delta x  + \frac{1}{2}\Delta x ^T\nabla^2f(x)\Delta x 
+\end{equation}
+This follows from the second-order Taylor expansion with $x \in \mathbb{R}^n$ choosen as the expansion point. \cite{nocedal2006numerical}\\
+As previously mentioned, this function approximates a paraboloid. To find the minimizer of this approximation we differentiate with respect to $\Delta x $ and set the gradient to zero.
+\begin{align}
+    \begin{array}{rcl}
+    \frac{d}{d\Delta x } f(x+\Delta x ) & = & \nabla f(x) + \nabla^2 f(x) \Delta x  = 0 \\
+    & \iff & \Delta x  = -(\nabla^2 f(x))^{-1} \nabla f(x)
+    \end{array}
+\end{align}
+From this, we can conclude that $\Delta x $ represents the vector offset from the current position. This leads us to the following algorithm, which implements the Newton update rule
+\begin{align}
+x_k + \Delta x  = x_k - (\nabla^2 f(x))^{-1} \nabla f(x), \quad k \in \mathbb{N}.
+\end{align}
+Here, $x_k$ denotes the current position, while $x_k + \Delta x $ denotes the next position in the algorithm's path. Therefore, we set $x_k + \Delta x  = x_{k+1} $ and $ \mathbf{H} = (\nabla^2 f(x))^{-1} $, which yields the Newton update step \cite{nocedal2006numerical}
+\begin{align}\label{eq:newtonstep}
+x_{k+1} = x_k - \mathbf{H}_f(x_k)^{-1} \nabla f(x), \quad k \in \mathbb{N}.
+\end{align}
+This iterative process ensures that each step moves in the direction that minimizes the function \( f \) based on its local curvature and gradient.\\\\
+In practice however the pure Newton method does not necessarily converge~\cite{nocedal2006numerical}. \\
+There are several factors that contribute to this behavior, which can be categorized as follows:
+\begin{itemize}
+    \item \textbf{Non-Convex Function:} The Newton method relies on a second-order Taylor series expansion to approximate the function near the current point as a paraboloid.
+     In highly non-covex settings however this approximation might not reflect the function's true behavior in 
+    the neighbourhood of the expansion point. This way finding the minimum of the paraboloid might actually lead to a point that \emph{increases} the function value.\cite{kashyap2023survey}
+    \item \textbf{Singular Hessian Matrix :} In order for Newton's method to lead to a local minimum,
+     the Hessian matrix \( \nabla^2 f(x) \) must be \emph{positive-definite} at each step.
+     If the Hessian has mixed eigenvalues or is not positive-definite, the steps may lead away from a minimum.
+     \emph{BFGS} (Broyden–Fletcher–Goldfarb–Shanno) is a popular \emph{quasi-newton} optimization algorithm 
+     that solves this problem of non positive-definite Hessians, by iteratively approximating the inverse Hessian with a rank-2 update formula,
+      to preserve the non singular property of the Hessian (see \ref{sec:bfgs}) .\cite{nocedal2006numerical}
+    \item \textbf{Sensitive to Initial Point:} The choice of initial point $x_0$ can greatly affect the convergence and accuracy of Newton's method. A good initial value should be close to the actual minimizer.
+     Choosing a poor initial value can lead to divergent or inaccurate results, as the newton method converges and diverges quadratically.\cite{nocedal2006numerical}
+   
+\end{itemize}
+
+\subsubsection{Proof of Convergence}
+\label{sec:newton_conv}
+\marginpar{\cite{yao2021adahessian}}
+
+We conclude this section on the Newton method by a proof of its convergence in a strongly convex and strictly smooth setting.
+This proof serves as a reference for our subsequent discussion, where we argue that using only the diagonal of the Hessian inverse also yields
+a convergent algorithm under strongly convex and strictly smooth conditions. Although  we refer to \cite{yao2021adahessian} for this proof,
+it was originally described by \cite{boyd2004convex}.
+\\\\
+\noindent\textbf{Theorem (Quadratic Convergence of Newton's Method).} 
+\textit{Let $f: \mathbb{R}^d \to \mathbb{R}$ be a twice continuously differentiable, strongly convex and strictly smooth function.
+Then, the Newton update (see \ref{eq:newtonstep}),
+yields a quadratically converging algorithm with the following guarantee:
+\[ f(\theta_{t+1}) - f(\theta_t) \leq - \frac{\alpha}{2\beta^{2}} \|\nabla f(\theta_t)\|^2, \quad \theta  \in \mathbb{R}^d\]
+where  $\nabla f(\theta_t)$ denotes the gradient at $\theta_t$.}
+\vspace{1em}
+\noindent\\\textbf{Proof}\\
+As $f$ is twice continuously differentiable, strongly convex, and strictly smooth, we can state:
+\begin{equation}
+\label{eq:convex_smooth}
+\exists \alpha, \beta > 0 : \alpha I \preceq \nabla^2 f(\theta) \preceq \beta I, \quad \forall \theta \in \mathbb{R}^d,
+\end{equation}
+where $I$ is the identity matrix, $\alpha$ is the strong convexity parameter
+(satisfying $\exists \alpha > 0 : \alpha I \preceq \nabla^2 f(\theta), \quad \forall \theta \in \mathbb{R}^d$) \cite{convexity_smoothness},
+and $\beta$ is the strict smoothness parameter (satisfying $\exists \beta > 0 : \nabla^2 f(\theta) \preceq \beta I, \quad \forall \theta \in \mathbb{R}^d$) \cite{convexity_smoothness}.
+While $\preceq$ denotes the positive semidefinite ordering of matrices (see \ref{sec:matrix_definiteness}).\\
+Now define $\lambda\theta_t = \left( g_t^T \mathbf{H}_t^{-1} g_t \right)^{1/2}$ and $
+\Delta \theta = \mathbf{H}^{-1}g_t$.
+Given the $\beta$-smoothness property of $f$, we can infer that 
+\begin{align}
+    \begin{split}
+        f(\theta_t - \eta\Delta \theta_t) &\leq f(\theta_t) + g_t^T ((\theta_t - \eta\Delta \theta_t) - \theta_t) \\
+        &\quad + \frac{\beta}{2} \Vert (\theta_t - \eta\Delta \theta_t) - \theta_t \Vert ^2\\
+        &= f(\theta_t) - \eta g_t^T \Delta \theta_t + \frac{\eta^2\beta}{2} \Vert \Delta \theta_t \Vert ^2.
+    \end{split}
+\end{align}
+Now $(\lambda \theta_t)^2 = g_t^T \mathbf{H}_t^{-1} g_t  = \Delta \theta_t^T \mathbf{H}_t \Delta \theta_t$, and $g_t^T \Delta \theta_t =(\lambda\theta_t)^2 $. \\
+Because of the strong convexity of $f$ (see \ref{eq:convex_smooth}) we get
+\begin{align}
+    \label{eq:inequality}
+    \Delta \theta_t^T (\mathbf{H}_t - \alpha I) \Delta \theta_t &\geq 0 
+    \Longleftrightarrow \Delta \theta_t^T \mathbf{H}_t \Delta \theta_t   \geq \alpha \|\Delta \theta_t\|^2,
+\end{align}
+thus $  \Vert \Delta \theta_t \Vert ^2 \leq  \frac{1}{\alpha} \Delta \theta_t^T \mathbf{H}_t \Delta \theta_t = \frac{1}{\alpha} (\lambda \theta_t)^2 $.
+Now putting everything together
+\begin{equation}
+    f(\theta_t - \eta\Delta \theta_t) \leq f(\theta_t) - \eta (\lambda \theta_t)^2 + \frac{\eta^2\beta}{2\alpha} (\lambda \theta_t)^2.
+\end{equation}
+Setting the stepsize $\eta = \frac{a}{\beta}$ and expanding, it follows
+\begin{equation}
+    f(\theta_t - \eta\Delta \theta_t) \leq f(\theta_t) - \frac{1}{2} \eta (\lambda \theta_t)^2 .
+\end{equation}
+We follow \ref{eq:inequality} and since $\frac{1}{\beta}I \preceq (\nabla^2 f(\theta))^{-1}  $, we get
+\begin{equation}
+    (\lambda \theta_t)^2 = g_t^T \mathbf{H}_t^{-1} g_t \geq \frac{1}{\beta} \Vert g_t \Vert ^2,
+\end{equation}
+with which we finally arrive at the claim
+\begin{equation}
+    f(\theta_t - \eta\Delta \theta_t) - f(\theta_t) \leq -\frac{1}{2 \beta} \eta \Vert g_t\Vert^2 =  -\frac{a}{2 \beta^{2}}  \Vert g_t\Vert^2.
+     \hfill \fbox{\phantom{\rule{.2ex}{.2ex}}}
+\end{equation}
+
+\subsection{DFP \& BFGS}
+\label{sec:bfgs}
+Now that we know why the Hessian is a very useful quantity for optimization, we will take a look at how we can approximate it,
+as exact calculation is infeasible for most large-scale problems.
+The Davidon-Fletcher-Powell (\emph{DFP}\cite{Goodfellow-et-al-2016})  and Broyden-Fletcher-Goldfarb-Shanno (\emph{BFGS}\cite{BFGS})
+algorithms are so-called quasi-Newton algorithms 
+that use a positive definite approximation of the Hessian. In the following,
+we cover the main ideas of \emph{DFP} and \emph{BFGS}. We start by introducing the quasi-Newton update formula,
+\begin{equation}
+x_{k+1} = x_k - \mathbf{B}_k^{-1} \nabla f(x_k), \quad k \in \mathbb{N},
+\end{equation}
+where $\mathbf{B}_k$ is the Hessian approximation at timestep $k$ \cite{nocedal2006numerical}.
+From this, we can derive the \emph{secant equation},
+\begin{equation}
+\mathbf{B}_k s_k = y_k,
+\end{equation}
+where $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ and $s_k = x_{k+1} - x_k$.
+We cover the derivation of these in full detail in \ref{sec:apollo}.
+By multiplying the above with $s_k^T$, we can conclude, that if $s_k^T y_k > 0$,
+known as the \emph{curvature condition}, holds, there exists a $\mathbf{B}_k$ with positive curvature along $s_k$,
+meaning $s_k^T\mathbf{B}_k s_k > 0$.
+\begin{equation}
+    \mathbf{B}_{k+1} = \min_{B} \|B - \mathbf{B}_k\| \\
+    \text{s.t. }   B = B^T, \; Bs_k = y_k 
+   \end{equation}
+When using the Frobenius norm for this optimization problem, we get a unique solution for $\mathbf{B}_{k+1}$ with,
+\begin{equation} \label{eq:DFP}
+\mathbf{B}_{k+1} = \left(I - \rho_k y_k s_k^T\right) \mathbf{B}_k \left(I - \rho_k s_k y_k^T\right) + \rho_k y_k y_k^T,
+\end{equation}
+where $\rho_k = \frac{1}{y_k^T s_k}$. This update formula is usually referred to as the \emph{DFP} updating formula \cite{DFP}.
+As we need the inverse $\mathbf{C}_{k+1} := \mathbf{B}_{k+1}^{-1}$ for performing the Newton step (see \ref{eq:newtonstep}), one can employ the \emph{Sherman--Morrison--Woodbury} formula, defined as
+\begin{equation}
+    (A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^T A^{-1}}{1 + v^T A^{-1}u} \\ A \in \mathbb{R}^{n \times n},\\
+    u, v \in \mathbb{R}^n,\\
+\end{equation}
+    to show by expanding and subsequently rearranging \ref{eq:DFP}, that
+\begin{equation}
+\mathbf{C}_{k+1} = \mathbf{C}_k - \frac{\mathbf{C}_k y_k y_k^T \mathbf{C}k}{y_k^T \mathbf{C}k y_k} + \frac{s_k s_k^T}{y_k^T s_k},
+\end{equation}
+which is the update equation that is used in the \emph{DFP} algorithm.
+The \emph{BFGS} algorithm works very similarly, with the subtle difference that it imposes the above conditions on the inverses of the Hessian approximations, meaning we have
+\begin{equation}
+\mathbf{C}{k+1} = \min_{C} \|C - \mathbf{C}k\| \\\text{s.t. } C = C^T, \quad Cy_k = s_k
+\end{equation}
+Again, \emph{BFGS} uses the Frobenius norm, which leads to the following update formulation:
+\begin{equation}
+\mathbf{C}_{k+1} = (I - \rho_k s_k y_k^T)  \mathbf{C}_k(I - \rho_k y_k s_k^T) + \rho_k s_k s_k^T,
+\end{equation}
+with $\rho_k = \frac{1}{y_k^T s_k}$. As $\mathbf{C}_{k+1}$ is already an approximation of the Hessian inverse at 
+$x_k$, we can directly use it for step calculation. Regarding the initial choice of $\mathbf{C}_0$, one often selects the identity matrix
+or approximates the Hessian inverse using finite differences on the gradient, when computationally feasible.
+As there is no universally effective initialization method for $\mathbf{C}_0$ across all optimization problems.
+
+
+\comment{
+\subsection{The Damped Newton's Method and Line search}
+\label{sec:damped_newton}
+One approach to dampen the effects that a non-convex landscape and or a singular Hessian has on the convergence properties of the newton method is the so-called \emph{damped newton method}.\\ The idea is to introduce a dampening parameter $t \in \mathbb{R}$, to scale the inverse Hessian such that we achive a descent of the function values:
+\begin{align}
+    x_{k+1} = x_k - t\mathbf{H}_f(x_k)^{-1} \nabla f(x), \quad k \in \mathbb{N},
+\end{align}
+
+where $t \in \mathbb{R}$ is determinded with the \emph{backtracking line search} algorithm. This algorithm introduces two parameters $0< \alpha\leq \frac{1}{2}$ and $0 < \beta < 1$. At start $t=1$, while
+\begin{align}
+    f(x_k -t\mathbf{H}_f(x_k)^{-1} \nabla f(x)) >  f(x_k) -\alpha t\mathbf{H}_f(x_k)^{-1} \nabla f(x),
+\end{align}
+
+we shrink $t = \beta t$, until the above condition no longer holds and we perform the Newton step \cite{nocedal2006numerical}. \\\\
+As we can see, this approach helps ensure that each step leads to a sufficient decrease in the function's value, therefore mitigating the convergence issues posed by non-convexity or a singular Hessian.
+In practice, however, due to the computational burden, line search is often avoided, especially when the optimization problem involves many parameters.
+Instead, the step size is often fixed and chosen as a hyperparameter, at the expense of losing the guaranteed decrease provided by line search \cite{linesearch}.
+}
+
+\subsection{AdaHessian}
+\label{sec:adahessian}
+\emph{AdaHessian}, introduced in 2020 by Yao et al. \cite{yao2021adahessian}, is an adaptive second-order optimization algorithm.
+While being conceptually very similar to \emph{Adam} (\ref{sec:adam}), \emph{AdaHessian} replaces the square of the gradients
+in \emph{Adam's} second moment with the square of a Hessian diagonal approximation.
+To estimate the Hessian diagonal, AdaHessian employs two key techniques.
+First, it utilizes a Hessian-free method based on the Hessian-vector product \cite{pearlmutter1994fast}.
+This approach allows for efficient computation without explicitly forming the full Hessian matrix.
+Second, AdaHessian implements a stochastic Hessian diagonal approximation based on \cite{martens2015optimizing},
+which leverages the Hutchinson method \cite{hutchinson}, a technique for trace estimation of matrices.
+Now let $f$ with $f: \mathbb{R}^n \to \mathbb{R}$ and $x \in \mathbb{R}^n$, be a neural network with subsequent
+loss calculation. We start by taking the scalar product of $g=\nabla_\theta f$ with $z$, where
+$z\in \mathbb{R}^n$ is a random vector which follows a Rademacher distribution. This results in a scalar.
+We then calculate the derivative of this scalar with respect to $\theta$, such that we get
+\begin{equation}
+ \frac{\partial g^T z}{\partial \theta} = \frac{\partial g^T}{\partial \theta} z + g^T \frac{\partial z}{\partial \theta} = \frac{\partial g^T}{\partial \theta} z = Hz.
+\end{equation}
+This method is known as a Hessian-free approach,because by calculating this derivative, we obtain a Hessian-vector product without explicitly forming the Hessian matrix.
+Following the results from  \cite{martens2015optimizing}, we get
+\begin{equation}
+    D = \text{diag}(H) = \mathbb{E}[z \odot (Hz)].
+\end{equation}
+The Hessian diagonal estimation in AdaHessian leverages an unbiased stochastic approximation technique.
+Specifically, the expression $z \odot (Hz)$, where $\odot$ denotes the Hadamard (element-wise) product, serves as an unbiased estimator for the diagonal elements of the Hessian matrix.
+Note that the authors of \cite{yao2021adahessian} found that a single sampling of $z$ is usually sufficient to lead to a reasonable diagonal approximation.
+Next up, we demonstrate that employing this diagonal approximation of the Hessian in the update step yields convergence properties equivalent to those achieved
+when utilizing the full Hessian matrix.
+\\\\
+\marginpar{\cite{yao2021adahessian}}
+\noindent\textbf{Theorem (Convergence Rate of Hessian Diagonal Method)} \\
+\textit{Let $f: \mathbb{R}^d \to \mathbb{R}$ be a twice continuously differentiable, strongly convex and strictly smooth function. Then, the update rule given by
+    \[ \theta_{t+1} = \theta_t - \eta D_t^{-1} g_t, \]
+    where $D_t$ is the diagonal of the Hessian $H_t = \nabla^2 f(\theta_t)$ and $g_t = \nabla f(\theta_t)$, yields a converging algorithm with the following guarantee
+    \[ f(\theta_{t+1}) - f(\theta_t) \leq - \frac{\alpha}{2\beta^{2}} \|g_t\|^2, \quad \theta \in \mathbb{R}^d. \]
+   }\noindent\textbf{Proof}\\ As $f$ is strongly convex and strictly smooth function, we know from \ref{sec:newton_conv}, that $\exists \alpha, \beta > 0 : \alpha I \preceq \nabla^2 f(\theta) \preceq \beta I, \quad \forall \theta \in \mathbb{R}^d$.
+    To demonstrate that these bounds also apply to the diagonal matrix $D$, let's consider the standard basis vectors.
+For any $e_i$, where all elements are $0$ except for the $i$-th one, which is $1$, we can observe:
+\begin{equation}
+       \alpha \leq e_i^T H e_i = e_i^T D e_i = D_{i,i} \quad \text{and} \quad \beta \geq e_i^T H e_i = e_i^T D e_i = D_{i,i}
+\end{equation}   
+This relationship implies that $D_{i,i} \in [\alpha,\beta], \quad \forall i \in \{1, \ldots, d\}$.
+Consequently, we can extend the matrix inequality to $D$, such that   
+   $\exists \alpha, \beta > 0 : \alpha I \preceq D \preceq \beta I, \quad \forall \theta \in \mathbb{R}^d$.   
+Given this result, we can apply the same convergence analysis as in \ref{sec:newton_conv}, thus proving the claim. $ \hfill \fbox{\phantom{\rule{.2ex}{.2ex}}}$
+\\
+
+
+
+
+
+
+
+To mitigate the inherent stochastic variance associated with this approximation, AdaHessian employs two key strategies.
+First, it maintains an Exponential Moving Average (EMA) of the diagonal estimates $D$.
+Second, AdaHessian implements a spatial averaging algorithm. Consider a Convolutional Neural Network (CNN) as an example. In a CNN, for a convolutional kernel with block size $b$ (for instance, $b = 9$ for a $3 \times 3$ kernel), we perform spatial averaging among the kernel's parameters.
+This can be mathematically expressed as:
+\marginpar{\cite{yao2021adahessian}}
+\begin{equation}
+    \label{eq:spatial-average}
+    D^{(s)}[ib+j] = \frac{1}{b} \sum_{k=1}^b D[ib + k], \quad \text{for } 1 \leq j \leq b, \; 0 \leq i \leq \left\lfloor\frac{d}{b}\right\rfloor - 1,
+\end{equation}
+where $d$ is the number of model parameters.After applying the spatial averaging, we can define the second momentum of AdaHessian with
+\begin{equation}
+    \label{eq:hessian-ema}
+    \bar{D}_t = \beta_2 \bar{D}_{t-1} + (1 - \beta_2) (D^{(s)})^2.
+\end{equation}
+Here, $\bar{D}_t$ represents the smoothed estimate of the squared Hessian diagonal at time step $t$, $\beta_2$ is the exponential decay rate for the second moment estimate, and $D_{(s)}$ is the spatially averaged Hessian diagonal estimate.
+As mentioned earlier, the rest of AdaHessian functions exactly analogous to Adam (see \ref{sec:adam}), leading to the
+algorithm described in \ref{alg:adahessian}. \cite{yao2021adahessian}
+\begin{algorithm}
+    \caption{AdaHessian}
+    \label{alg:adahessian}
+
+    \begin{algorithmic}[1]
+    \Require Initial parameter $\theta_0$
+    \Require Learning rate $\eta$
+    \Require Exponential decay rates $\beta_1, \beta_2$
+    \Require Block size $b$
+    \Require Hessian power $k$
+    \State Initialize $m_0 = 0, v_0 = 0$
+    \For{$t = 1, 2, \ldots$} 
+        \State $g_t \gets \text{current step gradient}$
+        \State $D_t \gets \text{current step estimated diagonal Hessian}$
+        \State Compute $D_t^{(s)}$ based on \ref{eq:spatial-average}
+        \State Update $\bar{D}_t$ based on \ref{eq:hessian-ema}
+        \State $m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t$
+        \State $v_t = \beta_2 v_{t-1} + (1 - \beta_2) (D_t^{(s)})^2$
+        \State $\hat{m}_t = \frac{m_t}{1-\beta_1^t}$
+        \State $\hat{v}_t = \frac{v_t}{1-\beta_2^t}$
+        \State $\theta_t = \theta_{t-1} - \eta \frac{m_t}{v_t}$
+    \EndFor
+    \end{algorithmic}
+    \end{algorithm}
+    
+\subsection{Apollo}
+\label{sec:apollo}
+\emph{Apollo} \cite{apollo} is a rather newly proposed quasi-Newton algorithm for non-convex stochastic
+optimization. It operates by calculating a non-singular diagonal approximation  of the Hessian matrix,
+utilizing the weak secant equation. To elucidate the algorithm's mechanics, we first briefly
+revisit the theoretical foundations of the secant equation in general, and subsequently derive
+the algorithm from this basis. We recall from \ref{eq:newtonstep} that for a supposed neural network with subsequent
+loss calculation $f$ with $f: \mathbb{R}^n \to \mathbb{R}$ and $x \in \mathbb{R}^n$, we consider the Newton update step as follows:
+\begin{equation}
+    x_{k+t} = x_t - \mathbf{H}_f(x_t)^{-1} \nabla f(x_t), \quad k \in \mathbb{N}.
+\end{equation}
+For simplicity, we write $\mathbf{H}_t$ instead of $\mathbf{H}_f(x_t)^{-1}$. With this, we can derive the general \emph{quasi-Newton} update formula:
+\begin{equation}
+    x_{k+1} = x_k - \mathbf{B}^{-1} \nabla f(x_t), \quad t \in \mathbb{N},
+\end{equation}
+where $\mathbf{B}$ is an approximation of the Hessian matrix at $x_t$.
+We can rewrite this as
+\begin{align}
+    x_{t+1} &= x_t - \mathbf{B}^{-1} \nabla f(x_t), \quad k \in \mathbb{N} \nonumber \\
+    &\Longleftrightarrow x_{t+1} - x_t = - \mathbf{B}_t^{-1} \nabla f(x_t) \nonumber \\
+    &\Longleftrightarrow \mathbf{B}(x_{t+1} - x_t) = - \nabla f(x_t) \nonumber \\
+    &\Longleftrightarrow \mathbf{B}(x_{t+1} - x_t) + \nabla f(x_t) = 0
+\end{align}
+From \ref{sec:newton} we know that$\nabla_{\Delta x} f(x+\Delta x)$ should satisfy $\nabla_{\Delta x} f(x+\Delta x) = 0$. We can therefore 
+conclude that $\mathbf{B}$ has to satisfy
+\begin{equation}
+    \nabla_{\Delta x} f(x+\Delta x) = \mathbf{B}(x_{t+1} - x_t) + \nabla f(x_t).
+\end{equation}
+This is equivalent to computing a second-order Taylor expansion (see \ref{eq:taylor}), then taking the gradient with respect to $\Delta x$.
+We then proceed by defining
+\begin{align}
+    y_t &= \nabla_{\Delta x} f(x+\Delta x) -  \nabla f(x_t) \\
+    s_t &= x_{t+1} - x_t,
+\end{align}
+such that the before formula is now
+\label{eq:secant-eq}
+\begin{equation}
+    \mathbf{B}s_t = y_t,
+\end{equation}
+which is also known as the \emph{strong secant equation}. For the next approximation, we choose the
+closest matrix to $\mathbf{B}$ under the condition of the \emph{strong secant equation}.
+Therefore, our algorithm for updating
+the Hessian approximation $\mathbf{B}$ will now be 
+\begin{equation}
+    \mathbf{B}_{t+1} = argmin_{\mathbf{B}} \|\mathbf{B} - \mathbf{B}_t\|,\\
+    \text{s.t. }  \mathbf{B}_{t+1}\mathbf{s}_t = \mathbf{y}_t.
+\end{equation}
+This optimization problem forms the foundation for a family of quasi-Newton algorithms
+such as BFGS\cite{BFGS}, DFP\cite{DFP}, or SR1\cite{SR1}.\cite{apollo}.
+\emph{Apollo} employs a weakened form of the \emph{secant equation}, known as the \emph{weak secant equation}. The rationale behind this choice is as follows:
+While we have used a scalar-valued function $f$ in our example, the difference of the gradients $y_t$
+is a vector-valued function. For such functions, the \emph{mean value theorem}—which forms the basis of the standard secant equation in \ref{eq:secant-eq}—generally does not hold\cite{apollo}. 
+Therefore, we apply the scalar product with $s_t^T$ to weaken the condition. This relaxes the equality requirement to hold only in the direction of $s_t$.
+\begin{equation}
+    \label{eq:weak-secant-eq}
+    \mathbf{B}_{t+1} = argmin_{\mathbf{B}} \|\mathbf{B} - \mathbf{B}_t\|, \\
+    \text{s.t. } \mathbf{s}^T_t \mathbf{B}_{t+1}\mathbf{s}_t =\mathbf{s}^T_t \mathbf{y}_t.
+\end{equation}
+This optimization problem can be solved by an approach first proposed in \cite{Zhu1999TheQR},
+where the norm in \ref{eq:weak-secant-eq} is interpreted as the Frobenius norm.
+\begin{equation}
+    \Lambda= \mathbf{B}_{t+1} - \mathbf{B}_t = \frac{s_t^T y_t - s_t^T \mathbf{B}_t s_t}{\|s_t\|_4^4} \text{Diag}(s_t^2)
+\end{equation}
+here $s_t^2$ is the element-wise square vector of $s_t$, and $\text{Diag}(s_t^2)$ is the diagonal matrix with diagonal elements from vector $s_t^2$, and $\|\cdot\|_4$ is the 4-norm of a vector \cite{apollo}.
+To ensure that the Hessian update remains invariant to the chosen stepsize, the step direction \( s_t \) is normalized by \( \eta_t \), leading to
+\begin{equation}
+    \Lambda' = - \frac{d_t^T y_t + d_t^T \mathbf{B}_t d_t}{\|d_t\|_4^4} \, \text{Diag}(d_t^2),
+\end{equation}
+where \( d_t = - \frac{s_t}{\eta_t} \). The whole algorithm for \emph{Apollo} is displayed in \ref{alg:apollo}.
+Instead of working with gradients \( g_t \) directly, we choose the exponential moving average of them, in the
+same fashion as we do in the \emph{Adam} optimizer \ref{sec:adam}. Because \emph{Apollo} uses the newton-step \ref{eq:newtonstep}
+for its parameter update, we have to make sure that the approximation $ \mathbf{B}$ is non singular.
+For that we define another diagonal matrix $ \mathbf{D_t}$ for which we choose
+\begin{equation}
+    \mathbf{D_t} =  \text{rectify}(|\mathbf{B_t}|,\sigma) = \max(|\mathbf{B_t}|,\sigma), \\ |\mathbf{B_t}| = \sqrt{\mathbf{B_t}^T\mathbf{B_t}},
+\end{equation}
+with $\sigma \geq 0$.
+This approach achieves two key objectives: First, it ensures that small steps are taken in regions of very high curvature (sharp edges),
+as \( |\mathbf{B_t}| \) becomes large in those cases, and that larger steps are taken when \( |\mathbf{B_t}| \) is low, although not excessively large, since saddle points are common in the loss landscape.
+Secondly, it guarantees that \( \mathbf{D_t} \) has no zero-valued diagonal elements, ensuring that it remains non-singular.
+In practice \emph{Apollo} chooses $\sigma=0.01$, although this can be tuned as a hyperparameter.\cite{apollo}
+
+\marginpar{\cite{apollo}}
+\label{alg:apollo}
+\begin{algorithm}
+    \caption{Apollo}
+    \begin{algorithmic}[1]
+    \State \textbf{Initial:} $m_0, d_0, B_0 \leftarrow 0, 0, 0$ \Comment{Initialize $m_0, d_0, B_0$ to zero}
+    \State Good default settings are $\beta = 0.9$ and $\epsilon = 10^{-4}$
+    \While{$t \in \{0, \ldots, T\}$}
+        \For{$\theta \in \{\theta_1, \ldots, \theta_L\}$}
+            \State $g_{t+1} \leftarrow \nabla f_t(\theta_t)$ \Comment{Calculate gradient at step $t$}
+            \State $m_{t+1} \leftarrow \frac{\beta(1-\beta^t)}{1-\beta^{t+1}}m_t + \frac{1-\beta}{1-\beta^{t+1}}g_{t+1}$ \Comment{Bias-corrected EMA}
+            \State $\alpha \leftarrow \frac{d_t^T(m_{t+1}-m_t)+d_t^TB_td_t}{(\|d_t\|_4+\epsilon)^4}$ \Comment{Calculate coefficient of $B$ update}
+            \State $B_{t+1} \leftarrow B_t - \alpha \cdot \text{Diag}(d_t^2)$ \Comment{Update diagonal Hessian}
+            \State $D_{t+1} \leftarrow \text{rectify}(B_{t+1}, 0.01)$ \Comment{Handle nonconvexity}
+            \State $d_{t+1} \leftarrow D_{t+1}^{-1}m_{t+1}$ \Comment{Calculate update direction}
+            \State $\theta_{t+1} \leftarrow \theta_t - \eta_{t+1}d_{t+1}$ \Comment{Update parameters}
+        \EndFor
+    \EndWhile
+    \State \textbf{return} $\theta_T$
+    \end{algorithmic}
+    \end{algorithm}
+
+ \section{Introduction to artificial Neural Networks}
+Biological neural networks are intricate systems of interconnected neurons that communicate with each other to process information.
+Each neuron, a specialized nerve cell, is designed to receive, process, and transmit signals through electrochemical processes.
+Around the year 1900, a groundbreaking realization emerged that these tiny physical building blocks of the brain — the nerve cells and their intricate
+connections — are responsible for perception, associations, thoughts, consciousness, and the ability to learn.\cite{GrundkursAI}
+The idea of creating an artificial version of the brain to replicate its functions and achieve a synthetic form of intelligence has a long history.
+
+The significant leap towards neural network-based artificial intelligence was made in 1943 by McCulloch and Pitts in their article "A Logical Calculus of the Ideas Immanent in Nervous Activity" \cite{McCullochPitts1943}.
+They were the first to present a mathematical model of the neuron as a fundamental computational unit of the brain.
+This article laid the foundation for constructing artificial neural networks and, consequently, for this crucial subfield of AI.\cite{GrundkursAI}
+With the advent of efficient optimization methods and improved computational power, researchers were able to develop and train neural
+networks that could genuinely learn and significantly enhance their performance.
+These advances in optimization algorithms, such as (stochastic) gradient descent, coupled with accelerating hardware like GPUs,
+enabled neural networks to process vast amounts of data. This breakthrough resulted in models that could recognize patterns,
+make predictions, and solve complex problems across various domains, effectively demonstrating their learning capabilities. \cite{GrundkursAI}
+In this section, we discuss the architecture and some of the underlying theory behind neural networks, including the algorithms used for training.
+We will explore how neural networks are structured, the roles of different layers, and how information flows through them.
+Additionally, we will delve into the principles and methods behind training algorithms like backpropagation, which adjust the network's weights to improve its predictive accuracy.
+\subsection{The artificial Neuron}
+\label{sec:neuron}
+
+\marginpar{\cite{GrundkursAI}}
+A neuron in an artificial neural network is modeled as a mathematical function that processes input signals and produces an output. The basic structure is as follows:
+\[
+y_j = f \left( \sum_{i=1}^{n} \theta_i x_i + b \right).
+\]
+where:
+\begin{itemize}
+    \item \( y_j \) is the output of the neuron,
+    \item \( f \) is a nonlinear activation function applied to the weighted sum of the inputs,
+    \item \( \sum_{i=1}^{n} \) is the summation over all input values,
+    \item \( \theta_i \) are the weights associated with each input,
+    \item \( x_i \) are the input values, and
+    \item \( b \) is the bias term.
+\end{itemize}
+The inputs $x_i$ of a neuron are each weighted with an individual weighting factor $\theta_i$ and summed up.
+These factors $\theta_i$ together with the \emph{bias term} $b$,
+represent the trainable parameters of a neuron and are responsible for its performance on a given task.
+The sum is then fed into a non linear activation function $f$.
+This function is modeled on the idea that the activity of real biological neurons depends on a certain activation threshold\cite{GrundkursAI}.
+Activation functions that are commonly used in practice are the \textbf{sigmoid-function}  $f(z) = \frac{1}{1 + e^{-z}}$ or \textbf{ReLU} (Rectified Linear Unit) $f(z) = \max(0, z)$\cite{nair2010rectified}.
+The \emph{bias term} $b$ helps adjust the output by shifting the activation function horizontally.
+This allows the neuron to represent patterns that are not centered around the origin, making it able to better approximate a hyperplane.\cite{GrundkursAI}
+
+\subsection{The Multi-Layer Perceptron (MLP)}
+\label{sec:mlp}
+
+A single neuron is limited in its ability to distinguish between linearly separable data points, as its mathematical formulation models a hyperplane. Consequently, it cannot represent the output of an XOR (exclusive OR) gate.
+This is because the XOR function is not linearly separable.\cite{Goodfellow-et-al-2016}\\
+To overcome this limitation, the Multilayer Perceptron (MLP) was introduced.
+An MLP consists of multiple stacked layers of single perceptrons (neurons with an activation function).
+Each layer takes an input, processes it through its perceptrons, and outputs a vector that can then be fed into the next perceptron layer.
+This structure enables the MLP to handle complex, non-linearly separable data, such as the XOR function.\cite{Goodfellow-et-al-2016}
+The output of an MLP layer can be mathematically expressed as:
+\[
+x^{(l)} = f \left( \theta^{(l)} x^{(l-1)} + b^{(l)} \right),
+\]
+
+where:
+\begin{itemize}
+    \item \( l \) is the current layer,
+    \item \( x^{(l)} \) is the output of layer \( l \),
+    \item \( f \) is the activation function applied to the layer's output,
+    \item \( \theta^{(l)} \) is the weight matrix of layer \( l \),
+    \item \( x^{(l-1)} \) is the input vector to layer \( l \) (output of the previous layer),
+    \item \( b^{(l)} \) is the bias vector of layer \( l \).
+\end{itemize}
+As we can see, the formulation follows the same principle as a single neuron but now in a vectorized form. 
+\( \mathbf{\theta}^{(l)}  \) is a weight matrix of size \( n \times m \), where \( m \) is the number of inputs to a single neuron of the next layer and \( n \) is the number of neurons in a single layer.
+\( \mathbf{x}^{(l-1)} \) is the output vector from the previous layer.
+From their matrix-vector product, we get the pre-activations for each layer in vectorized form.
+This vector is then fed into a non-linear activation function, whose output is then fed into the next layer.
+
+It is easy to see why the activation function must be non-linear.
+If the activation functions were linear, the stacked MLP layers would collapse into a single layer,
+rendering the model unable to fit complex, highly non-linear data.\cite{Goodfellow-et-al-2016}
+\marginpar{\cite{Goodfellow-et-al-2016}}
+
+The MLP falls into the category of feedforward neural networks, meaning that the flow of information is unidirectional,
+from one layer to the next. Each layer passes its information forward to the subsequent layer.
+In contrast, there are other network architectures, such as recurrent neural networks (RNNs),
+where the flow of information is not restricted to only consecutive layers. In RNNs, information can loop back to the same layer, 
+allowing the network to maintain and utilize internal state information over time.
+In practice, a Multilayer Perceptron (MLP) typically consists of an input layer that takes the data 
+and passes it to one or more hidden layers before reaching the output layer.
+In the output layer, the data is usually mapped to a probability distribution using a softmax function:
+\begin{align}
+\sigma(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{m} e^{z_j}} \quad \text{for } i = 1, 2, \ldots, m ,
+\end{align}
+
+which can then be used to get the model's prediction depending on the task that should be performed.
+\comment{
+\subsection{Neural Networks as Universal Function Approximators}
+\label{sec:nn_approx}
+
+Neural Networks are exceptional function approximators, particularly when large datasets from the relevant domain
+are available. Almost all practical problems, such as playing a game of Go or mimicking intelligent behavior,
+can be represented by mathematical functions.\cite{universal_approx_theorem_2023} Universal approximation theorems are theoretical results 
+that demonstrate the types of functions neural networks can learn or approximate in theory.
+Recently, Lu et al. (2017)\cite{lu2017expressive} made an interesting discovery regarding width-bounded ReLU networks:
+
+\begin{quote}    
+    For any Lebesgue-integrable function \( f : \mathbb{R}^n \to \mathbb{R} \) and any \( \varepsilon > 0 \), there exists a fully-connected ReLU network \( A \) with width \( d_m \leq n + 4 \), such that the function \( F_A \) represented by this network satisfies
+    \begin{align}
+    \int_{\mathbb{R}^n} |f(x) - F_A(x)| \, dx < \varepsilon.
+    \end{align}
+
+    \end{quote}
+\marginpar{\cite{lu2017expressive}}
+
+This result applies to fully-connected ReLU networks with arbitrary depth,
+meaning an arbitrary number of hidden layers, but with bounds on the width of each layer,
+that is, the number of neurons in each layer.
+We can therefore conclude that we can always find a neural network that is able to approximate a function $f : \mathbb{R}^n \to \mathbb{R}$, to
+arbitrary degree.
+However, determining the specific structure of this network (i.e. the values of the parameters) cannot be derived from these theoretical guarantees.
+To find such a network, we need to optimize or train it to achieve a good approximation of the desired function.
+The algorithm used for this process will be the topic of the next section.
+}
+
+
+\subsection{Training of Neural Networks}
+\label{sec:nn_training}
+
+The goal of training is to find a set of parameters such that the neural network minimizes a particular cost function.
+The cost or loss function is a measure that determines the amount of error in the predictions \( \hat{y} \) 
+made by the neural network on a given dataset. In supervised training,
+we have a set of data points $x \in \mathbf{X}$ and the corresponding \emph{ground truth} labels $y \in \mathbf{Y}$.
+We formulate our cost function such that it calculates the deviation between a ground truth label \( y \) and the
+prediction \( \hat{y} \) of the network given the corresponding data point. One of the most popular loss functions is the Mean Squared Error (MSE):
+\begin{align}
+\text{MSE} = \frac{1}{m} \sum_{i=1}^{m} (\hat{y_i} - y_i)^2.
+\end{align}
+The MSE measures the Euclidean distance between the predictions \(\hat{y}\) and the ground truth \(y\). It is straightforward to show that minimizing the MSE is equivalent to maximizing the log likelihood:
+\begin{align}
+\theta_{\text{ML}} = \arg \max_{\theta} \sum_{i=1}^{m} \log P(y^{(i)} | x^{(i)}; \theta).
+\end{align}
+where \(\theta_{\text{ML}}\) is the set of parameters that maximizes the probability that the labels \(y^{(i)}\) correspond to the data points \(x^{(i)}\).
+
+Another common loss function, often used for classification tasks, is the Cross-Entropy Loss:
+\begin{align}
+H(y, \hat{y}) = - \frac{1}{m} \sum_{i=1}^{m} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c}).
+\end{align}
+
+where $m$ and $C$ are the number of samples and classes respectively.
+To understand the intuition behind this definition, consider a target or true probability distribution \(P\) and an approximate distribution \(Q\).
+The cross-entropy between \(Q\) and \(P\) quantifies the additional number of bits needed to encode events from \(P\) using the distribution \(Q\) instead of the true distribution \(P\).
+By minimizing the cross-entropy between \(Q\) and \(P\), we improve the approximation of the true distribution \(P\) using the model distribution \(Q\).\cite{bishop2006pattern}\\
+To train the model, i.e., to tune its parameters such that the loss of the model's output is minimized,
+we use gradient-based optimization methods as described in \ref{eq:newtonstep}.
+To calculate the gradient of the parameters, we employ the \emph{backpropagation algorithm}.
+The backpropagation algorithm was first introduced by Rumelhart, Hinton, and Williams in 1986 \cite{rumelhart1986learning}.
+Unless otherwise noted, all information in this section regarding the technique is taken from their work.
+It utilizes the chain rule to efficiently backpropagate gradient information from the last layer to the first.\\
+Before applying the backpropagation algorithm, we first have to evaluate all the layers and activations in the network.
+This process is often called the forward pass.
+After computing the loss \(L\), we calculate the gradient of \(L\) with respect to the pre-activations of the model output, which we denote as
+$\delta^{M} = \frac{\partial L}{\partial z^{(M)}} = \frac{\partial L}{\partial \hat{y}^{(M)}} \cdot \frac{\partial \hat{y}^{(M)}}{\partial z^{(M)}}$
+, where \(z^{(M)} = \theta^{(M)} x^{(M-1)} + b^{(M)}\) and \(\hat{y} = f(z^{(M)})\), with \(M\) being the last layer.
+We then loop back to the first layer with \(0 \leq m < M\) and calculate the respective gradients of the current layer using the gradient information from the previous layer. For that, we set
+\begin{align}
+    \delta^{(m)} &= \frac{\partial L}{\partial z^{(m)}} \\
+                 &= \left[ \frac{\partial L}{\partial z^{(m+1)}} \frac{\partial z^{(m+1)}}{\partial \hat{y}^{(m)}} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
+                 &= \left[ \delta^{(m+1)} \frac{\partial z^{(m+1)}}{\partial \hat{y}^{(m)}} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
+                 &= \left[\delta^{(m+1)} \theta^{(m+1)}  \right] \odot \nabla_{z^{(m)}} f.
+\end{align}
+Here, $\odot$ denotes the element-wise (Hadamard) product.
+To calculate the gradient information for the $i$-th the parameter of a neuron $j$ in layer $m$, we set
+\begin{align}
+\frac{\partial L}{\partial \theta_{j,i}^{(m)}} &= \frac{\partial L}{\partial z_j^{(m)}} \cdot \frac{\partial z_j^{(m)}}{\partial \theta_{j,i}^{(m)}} = \delta^{(m)}_j \cdot \hat{y}_i^{(m-1)},\\
+\frac{\partial L}{\partial b_{j}^{(m)}} &= \frac{\partial L}{\partial z_j^{(m)}} \cdot \frac{\partial z_j^{(m)}}{\partial b_{j}^{(m)}} = \delta^{(m)}_j.
+\end{align}
+We do this iteratively until we reach the first layer. After that, we employ the optimization step in which we tune
+the parameters to follow the negative gradient step as seen in \ref{sec:sgd}.
+This step represents the crux of this work, which focuses on the efficient adjustment of network parameters by
+incorporating not only gradient information but also second-order information to achieve faster convergence.
+Algorithm \ref{alg:backprop} provides an overview of the backpropagation algorithm in pseudocode.
+
+
+\begin{algorithm}
+    \caption{Neural Network Backpropagation \cite{rumelhart1986learning}}
+    \label{alg:backprop}
+    \begin{algorithmic}[1]
+    \Require Training data $\{(x^{(i)}, y^{(i)})\}_{i=1}^{m}$, learning rate $\alpha$
+    \State Initialize weights $W$ and biases $b$ randomly
+    \Repeat
+        \ForAll{training example $(x^{(i)}, y^{(i)})$}
+            \State \textbf{Forward Pass:}
+            \State Compute activations for each layer
+            \State \textbf{Compute Loss:}
+            \State Compute loss $L(y, \hat{y}^{(M)})$
+            \State \textbf{Backward Pass:}
+            \State Compute $\delta^{M} = \frac{\partial L}{\partial z^{(M)}} = \frac{\partial L}{\partial \hat{y}^{(M)}} \odot \frac{\partial \hat{y}^{(M)}}{\partial z^{(M)}}$
+            \For{$m = M-1$ \textbf{to} $0$}
+                \State Compute $\delta^{(m)} = [\delta^{(m+1)} \theta^{(m+1)}] \nabla_{z^{(m)}} f$
+                \State Compute gradients:
+                \State $\frac{\partial L}{\partial \theta_{i,j}^{(m)}} = \delta^{(m)}_j \odot \hat{y}_i^{(m-1)}$
+                \State $\frac{\partial L}{\partial b_j^{(m)}} = \delta_j^{(m)}$
+            \EndFor
+        \EndFor
+        \For{$l = 0$ \textbf{to} $M$}
+            \State Update weights: $\theta^{(l+1)} \leftarrow \theta^{(l)} - \alpha \frac{\partial L}{\partial \theta^{(l)}}$
+            \State Update biases: $b^{(l+1)} \leftarrow b^{(l)} - \alpha \frac{\partial L}{\partial b^{(l)}}$
+        \EndFor
+    \Until{convergence}
+    \end{algorithmic}
+    \end{algorithm}
+\marginpar{\cite{Goodfellow-et-al-2016}}
+In addition to the gradient calculation and optimization steps, there are many other factors that determine the success of training a neural network.
+A crucial aspect of training a neural network is finding a good set of values for the hyperparameters,
+as most deep learning algorithms come with several hyperparameters that control various aspects of the algorithm's behavior.
+Key hyperparameters include the learning rate,
+the number of epochs, the batch size, the architecture of the network (number of layers and neurons per layer) and as weighting factors.
+Optimizing these hyperparameters is highly non-trivial and are either determined through manual or automatic selection.
+The goal is to find a set of hyperparameter such that the generalization error is as small as possible.
+To facilitate this optimization, the training data is typically divided into three distinct sets: the \emph{training set},
+the \emph{validation set}, and the \emph{test set}. The training set is used to train the model,
+while the test set is reserved for evaluating the model's final performance. 
+The validation set is specifically used for tuning hyperparameters and monitoring the model's performance to avoid overfitting
+(i.e., achieving low training error but high generalization error), as the generalization error
+for many hyperparameters, such as the learning rate, often follows a U-shaped curve when plotted as a function
+of the hyperparameter, making careful selection of these hyperparameters essential.
+As we have already stated, overfitting and underfitting are common pitfalls during model training, resulting in the model either memorizing the training data (overfitting) 
+or failing to learn the training data at all (underfitting).
+ A common method to tackle this problem is \emph{regularization}, which is often defined as "any modification made to a learning algorithm that
+is intended to reduce its generalization error but not its training error" \cite{Goodfellow-et-al-2016}.
+In theory, regularization is used to reduce the amount of variance in a model, at the cost of increasing the model's
+ bias. This is often referred to as the \emph{bias-variance tradeoff}. While the bias is a measures for the inherent inability of
+ a model to capture the true relationship of the data, variance measures the variability of predictions across different 
+sets of data. Thus reducing the variance of a model, results in a better generalization ability on unseen data.\cite{IBMRegularization}
+\marginpar{\cite{Goodfellow-et-al-2016}}
+There are various techniques to facilitate regularization, one of 
+the most widely used regularization techniques is the norm penalty on the model's parameters. This introduces a penalty
+\(\Omega(\theta)\), where \(\Omega\) is a norm and \(\theta\) represents the network's parameters.
+We denote the regularized objective function by \(\tilde{J}\) such that we get:
+\begin{align}
+\tilde{J}(\theta; X, y) = J(\theta; X, y) + \lambda \Omega(\theta),
+\end{align}
+where \(\lambda\) is a hyperparameter that controls the strength of the regularization and is often called the \emph{weight decay}.
+In practice we only consider the \emph{weights} of the network for regularization instead of  all parameters \(\theta\) \cite{Goodfellow-et-al-2016}.
+The most widely used norms for \(\Omega\) are the \emph{L1} norm and the \emph{L2} norm.
+The \emph{L2} norm follows the definition of \(\Omega(\theta) = \frac{1}{2} \|w\|_2^2\).
+This formulation incentivizes the network to have \emph{weights} that lie closer to the origin
+by pushing parameters whose directions, corresponding to eigenvectors of the Hessian of $J$ with small
+eigenvalues (i.e., directions with small curvature), closer to zero.
+The \emph{L1} norm is defined as  \(\Omega(\theta) = \|\mathbf{w}\|_1 = \sum_i |\theta_i|\).
+It can be shown that \emph{L1} regularization encourages sparsity in the solution, meaning that many parameters are driven to an optimal value of zero.
+This property of the \emph{L1} regularizer is often used in a mechanism called \emph{feature selection},
+where the model learns which features are most important by driving many parameters to zero. 
+Other important regularization techniques that do not influence the loss function are \emph{dropout}
+and \emph{early stopping}. \emph{Dropout} is based on the idea of training an ensemble of subnetworks
+during the training of the larger model. This is achieved by multiplying the output of a unit 
+by zero with a given probability, effectively removing the unit from the network.
+This way, a large number of subnetworks are trained to predict the correct output, even when there
+is "brain damage" present. In practice, this often leads to better generalization abilities of the
+entire model. \emph{Early stopping} is another regularization technique that helps to prevent overfitting
+by monitoring the model's performance on the validation set during training. We stop the training onnce
+the model's performance on the validation step stops improving (or starts worsening), even if the performance
+on the training set continues to improve. Although simple, this form of regularization has been proven to be very effective.
+\cite{Goodfellow-et-al-2016}
+
+\subsection{Decoupled Weight Decay}
+\label{sec:dcp_weightdecay}
+
+\emph{Decoupled Weight Decay} \cite{Loshchilov2017FixingWD} introduces a novel approach that reorders the application of the network parameters $\theta$ within the optimizer.
+The authors find that the traditional implementation of weight decay, which is the addition of $\lambda \theta$ to the gradient in the optimizer \cite{Loshchilov2017FixingWD},
+is effectively equivalent to $L_2$ regularization
+for standard stochastic gradient descent (SGD). Given our \emph{L2} regularized loss $\tilde{J}(\theta; X, y)$,
+the gradient of this regularized loss function is
+\begin{align}
+\nabla_{\theta} \tilde{J}(\theta; X, y) = \nabla_{\theta} J(\theta; X, y) + \lambda \theta.
+\end{align}
+This yields the optimizer's update step
+\begin{align}
+\theta_{t+1} = \theta_t - \eta \nabla_{\theta} \tilde{J}(\theta; X, y) = \theta_t - \eta (\nabla_{\theta} J(\theta; X, y) + \lambda \theta_t)
+\end{align}
+\noindent as described in \cite{DecoupledWeightDecay}.
+
+This equivalence does not hold for adaptive gradient optimizers
+such as \emph{Adam}. In adaptive optimizers, the weight decay must be decoupled from the gradient update to
+maintain effective regularization and optimization~\cite{Loshchilov2017FixingWD}. In the standard implementation of Adam, \emph{weight decay} is incorporated into the gradient update step as follows:
+\begin{align*}
+    g_t &= \nabla_{\theta} J(\theta_t) + \lambda \theta_t, \\
+    m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t, \\
+    v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2.
+    \end{align*}
+Here, the weight decay term $\lambda \theta_t$ is added directly to the gradient of the loss function $J(\theta_t)$, which means the regularization is coupled with the gradient update.
+
+
+In \emph{decoupled weight decay}, however, the weight decay is applied simultaneously but separately from the gradient update step. This results in a new update rule:
+\begin{align}
+\theta_{t+1} = \theta_t - \eta (\frac{ \hat{m_t}}{\sqrt{\hat{v_t} + \epsilon}} + \lambda \theta_t).
+\end{align}
+
+In this formulation:
+\begin{itemize}
+  \item $\theta_t$ represents the parameters at iteration $t$,
+  \item $\lambda$ is the weight decay coefficient.
+\end{itemize}
+
+The decoupled weight decay ensures that the weight decay term $\lambda \theta_t$ is applied separately from the gradient step,
+avoiding interference with the adaptive nature of the gradient updates, where weights with large gradient magnitudes are regularized by a smaller relative
+amount than other weights. \cite{Loshchilov2017FixingWD}.
+
+
+\subsection{Exact Calculation of the Hessian Matrix for MLPs}
+\label{sec:hessian_exact}
+
+In this section we will discuss how we can calculate the exact Hessian of a Loss using the backpropagation
+algorithm that we covered earlier. We see that the exact values of the Hessian can be computed
+using only a few forward and backward propagations. It should be noted that although an efficient 
+form of calculation for the Hessian might be tempting, the storage requirements for such 
+computations are infeasible for larger neural networks. Therefore, in practice, only approximations
+of the Hessian or its diagonal are considered.
+Unless otherwise specified, all information of this section are taken from \cite{Bishop1992}.
+We will start by considering a feed-forward network with the standard notion introduced in \ref{sec:neuron}
+\begin{align}                                                                                              
+    z_i = \sum_j \theta_{ij} a_j + b_i  \quad &\quad
+    a_i = f(z_i),
+\end{align}
+
+with $z_i$ and $a_i$ beeing an output of the previous layer and it's corresponding current activation.
+We now want to find the first and second derivatives of an error function \(E\), which we model to consist of a sum of individual errors computed for each training instance
+\begin{align}
+E = \sum_p E_p,
+\end{align}
+
+where \(p\) labels the data point. We now consider a simple feedforward architecture without skip
+or feedback connections. Without loss of generality, we assume that unit \(i\) is in the same layer
+as unit \(n\), or in a lower layer. Due to the symmetry of the Hessian (see \ref{}), the remaining 
+terms do not have to be computed. Utilizing the chain rule, we can can formulate this as
+\begin{align}
+\frac{\partial^2 E_p}{\partial \theta_{ij} \partial \theta_{nl}} = \frac{\partial z_i}{\partial \theta_{ij}} \frac{\partial}{\partial z_i} \left( \frac{\partial E_p}{\partial \theta_{nl}} \right) = a_j \frac{\partial}{\partial z_i} \left( \frac{\partial E_p}{\partial \theta_{nl}} \right).
+\end{align}
+
+We now introduce a set of quantities \(\sigma_n\) defined by
+\begin{align}
+\sigma_n \equiv \frac{\partial E_p}{\partial z_n}.
+\end{align}
+
+Using this we can write the second derivative as
+\begin{align}
+\frac{\partial^2 E_p}{\partial \theta_{ij} \partial \theta_{nl}} = a_j \frac{\partial}{\partial z_i} (\sigma_n a_l),
+\end{align}
+
+because of $\frac{\partial z_n}{\partial \theta_{nl}} = a_l$. Further we introduce some additional quantities
+\begin{align}
+g_{li} \equiv \frac{\partial z_l}{\partial z_i} \quad &\quad
+b_{ni} \equiv \frac{\partial \sigma_n}{\partial z_i}.
+\end{align}
+
+Utilizing the product rule, the second derivatives can now be written in the following form
+\begin{align}
+\frac{\partial^2 E_p}{\partial \theta_{ij} \partial \theta_{nl}} = a_j \sigma_n \frac{\partial f}{\partial z_l}g_{li} + a_j a_l b_{ni},
+\end{align}
+where $ \frac{\partial f}{\partial z_l} =  \frac{\partial a_l}{\partial z_l}$ and $ \frac{\partial f}{\partial z_l}g_{li} =  \frac{\partial a_l}{\partial z_i}$
+Using the chain rule for partial derivatives we can evaluate the \( g_{li} \) as follows
+\begin{align}
+g_{li} = \sum_r \frac{\partial z_l}{\partial z_r} \frac{\partial z_r}{\partial z_i} ,
+\end{align}
+where the sum runs over all units \( r \) which send connections to unit \( l \). The above equation can be recursivly defined as
+\marginpar{\cite{Bishop1992}}
+\begin{align}
+g_{li} = \sum_r f'(z_r) \theta_{rl} g_{ri},
+\end{align}
+where $g_{ri} = \frac{\partial z_r}{\partial z_i}$ and $ \frac{\partial z_l}{\partial z_r}= \frac{\partial z_l}{\partial a_r}\frac{\partial a_r}{\partial z_r} = \theta_{rl} \frac{\partial f}{\partial z_r}$.
+To obtain the initial conditions, we set \(g_{ii} = 1\) and \(g_{li} = 0\) for all units \(l \neq i\) in the same or
+lower layers (i.e., layers nearer to the output). All the other \(g_{li}\) will be determinded during forward propagation
+using the above recursive equation. We can obtain the values for $\sigma_n$ in a very similar fashion
+\begin{align}
+\sigma_n = \sum_r \frac{\partial E_p}{\partial z_r} \frac{\partial z_r}{\partial z_n},
+\end{align}
+where the sum runs over all units \(r\) to which unit \(n\) sends connections. Therefore we get
+\begin{align}
+    \sigma_n = \sum_r \frac{\partial E_p}{\partial z_r} \frac{\partial z_r}{\partial z_n} = \sum_r \sigma_r \frac{\partial z_r}{\partial z_n} = \sum_r \sigma_r \theta_{rn} \frac{\partial a_n}{\partial z_n} = f'(z_n) \sum_r \sigma_r \theta_{rn}.
+\end{align}
+To obtain the initial condition for $\sigma_m$, where $m$ is the label of an output unit, we derive
+\begin{align}
+\sigma_m =  \frac{\partial E_p}{\partial z_m} = \frac{\partial E_p}{\partial a_m} \frac{\partial a_m}{\partial z_m} = f'(z_m) \frac{\partial E_p}{\partial a_m}.
+\end{align}
+Next up, we derive a generalized back-propagation equation for the \(b_{ni}\). Substituting the back-propagation formula of \(\sigma_n\) into the definition of \(b_{ni}\), we get
+\begin{align}
+b_{ni} = \frac{\partial}{\partial z_i} \left( f'(z_n) \sum_r \theta_{rn} \sigma_r \right).
+\end{align}
+calcuting the derivative gives
+\begin{align}
+b_{ni} = f''(z_n) g_{ni} \sum_r \theta_{rn} \sigma_r + f'(z_n) \sum_r \theta_{rn} b_{ri}.
+\end{align}
+
+Using the above relationships, we can formulate the initial condition for $b_{mi}$
+\begin{align}
+b_{mi} = \frac{\partial \sigma_m}{\partial z_i} =  \frac{\partial }{\partial z_i}\left(\frac{\partial E_p}{\partial z_m} \right) = \frac{\partial^2 E_p}{\partial z_m^2} \frac{\partial z_m }{\partial z_i} = H_m g_{mi},
+\end{align}
+with
+\begin{align}
+H_m \equiv \frac{\partial^2 E_p}{\partial z_m^2} = f''(z_m) \frac{\partial E_p}{\partial a_m} + (f'(z_m))^2 \frac{\partial^2 E_p}{\partial a_m^2}.
+\end{align}
+
+Once we have obtained the initial values of all the $b_{mi}$, the
+$b_{ni}$ of the remaining units, are determinded via back-propagation.
+To summarize this process, for each pattern or data point \( p \):
+
+\begin{enumerate}
+    \item Perform forward-propagation to calculate all \( a_n \) and \( g_{li} \) using their respective equations.
+    \item Execute back-propagation to determine \( \sigma_n \) and \( b_{ni} \).
+    \item Finally, evaluate the value of \(\frac{\partial^2 E_p}{\partial \theta_{ij} \partial \theta_{nl}}\) using the determinded values.
+\end{enumerate}
+\marginpar{\cite{Bishop1992}}
+
+The total number of distinct forward and backward propagations required per training pattern is equal to twice the number of hidden and output units in the network.
+The number of operations for each propagation scales with \(N\), where \(N\) is the total number of weights in the network.
+
+
+
+
+
+
+
+
+
+
+
+
+
+

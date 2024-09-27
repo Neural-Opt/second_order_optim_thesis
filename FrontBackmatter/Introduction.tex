@@ -1,0 +1,52 @@
+%*******************************************************
+% Abstract
+%*******************************************************
+%\renewcommand{\abstractname}{Abstract}
+\pdfbookmark[1]{Introduction}{Introduction}
+% \addcontentsline{toc}{chapter}{\tocEntry{Abstract}}
+\begingroup
+
+
+\chapter*{Introduction}\label{ch:introduction}
+
+Optimization techniques play a crucial role in science and engineering,
+as they enable the refinement of models and solutions by iteratively minimizing or maximizing
+objective functions. This process ensures that solutions are as effective and efficient as possible,
+impacting a wide range of applications,
+from designing engineering systems to refining algorithms in computational research.\\
+In the field of numerical optimization, we differentiate between so-called \emph{first-order} and \emph{second-order} optimization methods,
+where the former refers to solely utilizing \emph{first-order}, i.e., gradient information, for the task of optimization.
+
+Second-order optimization methods utilize both the gradient and Hessian information,
+providing deeper insights into the nature of the loss landscape. \\
+In traditional numerical optimization problems, second-order methods are essential for efficient algorithm design as they
+have provably better convergence properties than first-order methods.
+Techniques such as Newton's method utilize the Hessian for rapid convergence.\\
+Algorithms in this family often use a preconditioning matrix to transform the gradient before applying each step.
+Classically, the preconditioner is the matrix of second-order derivatives (the Hessian) in the context of
+exact deterministic optimization.\cite{anil2021scalable}\\
+In machine learning, the direct application of second-order information is unfortunately limited due to the computational 
+intensity and storage requirements of handling full Hessian matrices,
+particularly since today's models often involve billions of trainable parameters.
+While first-order methods like (stochastic) gradient descent (SGD) are preferred for the training of today's models
+because of their simplicity and reduced computational demands,
+they often fall short in convergence speed and sensitivity to hyperparameter settings.\\ 
+Recent practice of training large models even suggests
+that the utility of common first-order methods is quickly reaching a plateau, as their time-per-step is already negligible.
+Consequently, the only way to accelerate training is by reducing the number of steps taken by the optimizers to reach a solution.\cite{anil2021scalable}\\
+Therefore integrating Hessian-based information can potentially improve optimization efficiency by drastically increasing training convergence.
+In this thesis, we will focus on two novel approaches for neural network optimization: \emph{AdaHessian} \cite{yao2021adahessian} and \emph{Apollo},
+as they are optimizers that incorporate second-order information by estimating diagonal Hessian elements to adjust learning rates.
+This work will provide an in-depth analysis of both AdaHessian and Apollo, evaluating their performance in comparison to other optimizers, with focus on the quality of Hessian approximation.
+Additionally, we aim to make the following contributions:
+\begin{enumerate}
+    \item Examining whether the potential benefits of these optimizers, in terms of faster convergence and improved generalization, justify the increased computational costs.
+    \item Investigating whether the claimed advantage of these optimizers in providing a better approximation of the Hessian diagonal holds up when compared to simpler approximations made by first-order methods.
+    \item Exploring whether other optimization techniques with similar characteristics exist that offer a better tradeoff between performance and resource consumption.
+\end{enumerate}
+
+\vfill
+
+\endgroup
+
+\vfill

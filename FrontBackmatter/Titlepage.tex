@@ -1,0 +1,49 @@
+%*******************************************************
+% Titlepage
+%*******************************************************
+\begin{titlepage}
+    %\pdfbookmark[1]{\myTitle}{titlepage}
+    % if you want the titlepage to be centered, uncomment and fine-tune the line below (KOMA classes environment)
+    \begin{addmargin}[-1cm]{-3cm}
+    \begin{center}
+        \large
+
+        \hfill
+
+        \vfill
+
+        \begingroup
+            \centering % Fügt eine Zentrierung hinzu
+
+            \color{CTtitle}\spacedallcaps{\myTitle} \\ \bigskip
+        \endgroup
+
+        \centering
+        \spacedlowsmallcaps{\myName}\\ \bigskip
+        Geboren am 27.Oktober 1999 in Troisdorf
+        \vfill
+
+        \begin{center} % Verwende 'center', um das Bild genauer zu zentrieren
+            \begin{minipage}{\textwidth}
+                \centering
+                \includesvg[width=0.6\textwidth]{assets/UniBonnSiegel.svg} % SVG-Grafik zentrieren und Breite anpassen
+            \end{minipage}
+        \end{center}
+        \vfill
+
+
+        Bachelor Thesis Informatik\\ \bigskip \bigskip
+        Betreuer: Dr. Moritz Wolter \\
+        Zweitgutachter: Prof. Dr. Christian Bauckhage \\ \medskip
+        Institut für Informatik II – Visual Computing\\ \bigskip
+        Mathematisch-Naturwissenschaftliche Fakultät
+Rheinische Friedrich-Wilhelms-Universität Bonn\\ \bigskip \bigskip
+     
+
+        \myTime
+
+        \vfill
+
+    \end{center}
+  \end{addmargin}
+\end{titlepage}

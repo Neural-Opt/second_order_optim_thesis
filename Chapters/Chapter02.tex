@@ -1,0 +1,348 @@
+%*****************************************
+\chapter{Numerical Evaluations}\label{ch:examples}
+
+In Chapter 1, we covered the mathematical foundations of second-order optimization
+and its application within the context of neural networks.
+We discussed both fundamental and cutting-edge techniques for first-order and
+second-order optimization, providing a comprehensive overview of the field.
+In this chapter, we examine our experimental results, by comparing the performance and convergence properties of each
+optimizer including second-order optimization methods, namely
+AdaHessian\cite{yao2021adahessian} and Apollo\cite{apollo}, against established first-order optimizers on common datasets across multiple domains.
+Our research will be conducted on two computer vision datasets,
+namely CIFAR and (Tiny)ImageNet, as well as WMT-14, a machine translation dataset, which will
+be used to train a transformer model.
+For each of these datasets, we will discuss in depth the hyperparameter settings
+ and model selection process used in our experiments, and relating them to our results.
+This detailed documentation ensures that others can easily reproduce our results.
+Furthermore, we provide a thorough comparison of our findings with those reported 
+in the original papers of AdaHessian and Apollo. We critically analyze
+these results, offering insights into the strengths and weaknesses of each method.
+
+\section{Overview of Software and Tools Used}
+To efficiently evaluate the optimizers across various datasets with a range of hyperparameters,
+we developed a comprehensive benchmarking framework in Python 3.6.8.
+The code for this framework is publicly accessible on our GitHub repository\footnote{\url{https://github.com/Neural-Opt/second_order_optim_models}}.
+and is available for anyone to use and modify. The core of our framework is built on
+\emph{PyTorch}\cite{Paszke2019}. \emph{PyTorch} is a popular open-source machine learning framework known for its dynamic computation graph and easy to integrate GPU acceleration.
+For datasets and pre-built computer vision model architectures, we utilized the PyTorch-associated \emph{torchvision} module.
+Additionally, \emph{NumPy} is used in some of the utility functions and to prepare data for use with \emph{matplotlib}.
+From the hardware side, most of the experiments, unless otherwise specified, were conducted on \emph{Nvidia A40} GPUs.
+These GPUs are equipped with 48 \emph{GB} of GDDR6 memory and deliver FP32 performance of up to 19.5 TFLOPS.
+For efficient multi-GPU training, we used the PyTorch \emph{DataParallel} module, which splits the input across the specified GPU's by chunking along the batch dimension\cite{pytorch_dataparallel}.
+Because \emph{AdaHessian} uses \texttt{torch.autograd.grad} to compute the second order derivatives, we were not
+able to utilize the more efficient \texttt{DDP} (Distributed Data Parallel) package, as DDP currently
+doesn't work with the construction of derivative graphs. For more information on this, see this
+issue\footnote{\url{https://github.com/pytorch/pytorch/issues/63812}}.
+
+\section{Image Classification}
+
+For evaluation, we choose the most widely used first-order optimizers, as well as AdaHessian and Apollo for second-order
+optimizers. In addition to the regular metrics of \emph{Training Accuracy}, \emph{Training Loss},
+\emph{Test Accuracy}, and \emph{Test Loss}, we also evaluate the speed of each optimization step and 
+its memory usage during this step. This helps assess the real-world applicability of the second-order optimizers.
+Finally, we introduced a new metric called \emph{Time till Convergence (TTC)}.
+\emph{TTC} measures the time in epochs each optimizer needs for the \emph{Training Loss} to converge.
+We compute the Time till Convergence (TTC) by following Algorithm \ref{alg:convergence},
+which takes as input the loss data, a threshold, and a window size.
+To prevent outliers from distorting the results, we rely on short-term intervals, from which we calculate the mean.
+\begin{algorithm}
+    \caption{Time till Convergence (TTC) Calculation}
+    \label{alg:convergence}
+
+    \begin{algorithmic}[1]
+    \State \textbf{Input:} Loss array \texttt{data}, treshold \texttt{T}$=\frac{1}{100}$, window size $\sigma=5$
+    \State \textbf{Initialize:} $ \text{old\_mean} \gets mean(\texttt{data}[ \lvert \texttt{data}\rvert -\sigma :] )$ 
+    \For{$i = n-\sigma, n-\sigma, \dots, 0$ }
+    \State $ \text{new\_mean} \gets  mean(\texttt{data}[i:i+\sigma]) $
+        \If{$ |\text{new\_mean} - \text{old\_mean}| \le \texttt{T} $}
+            \State \textbf{continue}
+        \Else
+            \State $\texttt{ttc} \gets i + \arg\min (\text{new\_mean})$
+            \State \textbf{break}
+        \EndIf
+    \EndFor
+    \end{algorithmic}
+    \end{algorithm}
+For learning rate scheduling, we employ both \emph{milestone decay} as well as \emph{cosine annealing}.
+While \emph{milestone decay} decays the learning rate by a factor of $\gamma$ at
+specified milestones (certain epochs), \emph{cosine annealing} gradually reduces the learning rate
+following a cosine function.
+For our experiments, we use \emph{PyTorch's} implementation of \texttt{MultiStepLR} for milestone decay and
+\texttt{CosineAnnealingLR} for cosine annealing.
+In the next sections, we discuss the obtained results on the CIFAR-10 and TinyImageNet
+datasets, as well as the chosen hyperparameters for the optimizers and learning rate schedulers.
+
+\subsection{CIFAR-10}
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{cc}
+        \input{assets/chap2/cifar10/step-lr-real-comp.tex} \\ % Replace with the correct path to your .tex file
+    \end{tabular}
+    \caption{Evaluation of optimizers on CIFAR-10 using ResNet-110 with the \emph{milestone} learning rate scheduler, where hyperparameters
+    are held constant across all optimizers. For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$.}
+    \label{fig:cifar-10-milestone-real}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{cc}
+        \input{assets/chap2/cifar10/step-lr-second-order-best.tex} \\ % Replace with the correct path to your .tex file
+    \end{tabular}
+    \caption{Evaluation of optimizers on CIFAR-10 using ResNet-110 with the \emph{milestone} learning rate scheduler, where hyperparameters
+    are choosen optimally across all optimizers.
+    For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$.
+    }
+    \label{fig:cifar-10-milestone-second-best}
+\end{figure}
+
+The CIFAR-10 dataset comprises 60,000 RGB images, each with dimensions of 32x32 pixels,
+categorized into 10 different classes, with 6,000 images per class and a training/test split of 50000/10000.
+For evaluation, we utilize the ResNet-110 architecture.
+Unlike ResNet-18, ResNet-110 is specifically designed to handle smaller images,
+such as those found in the CIFAR-10 dataset. ResNet-110 comprises 54 BasicBlocks,
+divided into 3 layer groups, each containing 18 blocks. Each block in ResNet-110 is two layers deep.
+The first layer consists of a 3x3 convolution, followed by batch normalization and an
+activation function. The second layer also applies a 3x3 convolution and includes a
+skip connection that directly adds the input of the block to the output of the second
+layer. This is then followed by another application of an activation function (ReLU).
+After each layer group, the channel width doubles. This results in 16 channels for the first block group and 32 and 64 channels
+for the second and third block groups, respectively.
+Together with the fully connected classification layer of size 64x10, where 10 corresponds to the number of classes,
+this totals 110 layers \cite{Resnet110}.
+Given Apollo's status as a recent advancement in the development of second-order optimizers,
+we closely adhere to their evaluation methodology. This allows us to effectively compare their results
+with our own in subsequent analyses. We therefore set our training batch size to 128. 
+For the milestone lr-scheduler, we choose milestone epochs of $80$ and $120$ with
+$\gamma=0.1$, meaning that the learning rate is decayed by a factor of $10^{-1}$ at 
+epochs $80$ and $120$. For both the cosine-annealing and milestone learning rate scheduler, we train the model
+for $164$ epochs. 
+To ensure a fair comparison between first and second-order optimizers, we employed two key strategies.
+First, we addressed the potential for inherent advantages due to superior hyperparameter settings.
+To mitigate this, we applied the optimal hyperparameters of Adam or AdamW—widely regarded as industry
+standards—to the second-order optimizers.
+The authors of Apollo \cite{apollo} note that both Apollo(W) and AdaHessian benefit significantly
+from learning rate warmup. However, our goal was to evaluate the real-world applicability of
+these second-order optimizers under basic conditions. Therefore, we opted for the most
+rudimentary settings to assess whether Apollo(W) and AdaHessian could perform well
+without such enhancements.
+This approach tests the optimizers' effectiveness in real-world conditions,
+where complex tuning is often impractical. Secondly, we test all optimizers with their
+respective optimal parameters as mentioned in \cite{apollo}.
+As discussed in Section~\ref{sec:dcp_weightdecay}, \emph{weight decay} introduces
+an additional constraint to the optimizer. This technique aids in regularization,
+though it can sometimes result in slower convergence.
+To ensure fairness in our comparison, we applied the same learning rate and weight decay across all optimizers,
+which are listed in \ref{tab:cifar-real-comp}.
+Examining the results presented in Figure~\ref{fig:cifar-10-milestone-real}, which utilizes milestone
+learning rate decay, we observe several key findings. \emph{AdamW} and \emph{AdaBelief} converge the fastest with the best generalization.
+Although not optimally tuned, \emph{Apollo(W)} shows reasonable convergence and generalization,
+while \emph{AdaHessian} performs poorly with the chosen hyperparameters.
+When optimally tuned however, as shown in Figure~\ref{fig:cifar-10-milestone-second-best}, \emph{Apollo(W)} and \emph{AdaHessian} are capable of 
+outperforming other optimizers by a small margin. This suggests that \emph{AdaHessian} may require additional effort to tune its hyperparameters optimally,
+as commonly used settings from first-order methods have a much worse impact on performance compared to \emph{Apollo(W)}.
+
+
+
+%As a tradeoff, \emph{AdaHessian} converges slower than all other optimizers.
+%In contrast, \emph{ApolloW} matches the convergence speed of \emph{Adam} and \emph{AdaBelief}.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{cc}
+        \input{assets/chap2/cifar10/cosine-second-order-best.tex} \\ % Replace with the correct path to your .tex file
+    \end{tabular}
+    \caption{Evaluation of optimizers on CIFAR-10 using ResNet-110 with the \emph{cosine annealing} learning rate scheduler, where hyperparameters
+    are choosen optimally across all optimizers. For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$. }
+    \label{fig:cifar-10-cosine-second}
+\end{figure}
+Using the cosine annealing learning rate scheduler in our first evaluation strategy,
+we observe the same ordering of optimizers in terms of generalization and convergence behavior (see Figure~\ref{fig:cifar-10-cosine-real}).
+To expand on our second evaluation strategy, Figure \ref{fig:cifar-10-cosine-second}
+illustrates the performance of each optimizer when given its optimal set of hyperparameters,
+as specified in \cite{apollo}. As previously mentioned, \emph{AdaHessian}, \emph{Apollo} and 
+\emph{ApolloW} demonstrate superior performance in terms of generalization error. While both \emph{Apollo} and \emph{ApolloW} are able to converge faster than \emph{AdaHessian},
+especially in the early epochs, \emph{ApolloW} converges more slowly than its decoupled first-order counterparts,
+\emph{AdamW} and \emph{AdaBelief}.
+While \emph{AdaHessian}, \emph{Apollo} and \emph{ApolloW} perform similiar in the setting of 
+\ref{fig:cifar-10-cosine-second}, \emph{AdaHessian} exhorts much higher variability when compared to 
+\ref{fig:cifar-10-cosine-real}. This observation lends credence to the claim in \cite{apollo} that \emph{Apollo} and \emph{ApolloW} 
+may be more practical than \emph{AdaHessian} for real-world applications.\\
+Expanding on \emph{Apollo's} better generalization abilities, figure \ref{fig:cifar-10-cosine-second} shows that \emph{Apollo} and \emph{ApolloW} continue to decrease their
+test loss even at epoch 164, while \emph{Adam} and \emph{AdamW}, which share the same weight decay,
+experience a steadily increasing test loss.
+
+In Table \ref{tab:optimizer_comparison_perf}, we can observe the maximum memory consumption
+of each optimizer and the duration of one optimization step realtive to \emph{SGD}.
+Not surprisingly, \emph{Apollo} and \emph{AdaHessian} both take longer for each step and
+consume more memory (see Table \ref{tab:optimizer_comparison_perf}). While the increase in computation time and GPU memory is
+rather modest for \emph{Apollo}, we can see that \emph{AdaHessian} takes significantly
+longer for computation compared to both \emph{Apollo} and the first-order
+ methods, as well as consumes much more memory. This is likely the result of
+the second backward pass \emph{AdaHessian} uses to compute the second-order gradients,
+which also limits the use of \emph{AdaHessian} in practice.
+
+
+\begin{table}[h!]
+    \centering
+    \caption{Accuracy (\%) of different optimizers across CIFAR-10 and TinyImageNet, evaluated on 3 runs}
+    \label{tab:optimizer_comparison_acc}
+    \begin{tabular}{lcccccccccccc}
+        \toprule
+        & \multicolumn{2}{c}{CIFAR-10} & \multicolumn{2}{c}{Tiny ImageNet} \\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5}  \cmidrule(lr){6-7} 
+        & \textbf{Milestone} & \textbf{Cosine}  & \textbf{Milestone} & \textbf{Cosine}    \\
+        \midrule
+        SGD         & 87.2 ± 0.86  & 88.17 ± 0.3 & 44.73  & 38.56  \\
+        Adam        & 90.8 ± 0.39   & 90.32 ± 0.08  & 44.08 & 43.44    \\
+        AdamW       & 90.35 ± 0.06  & 89.99 ± 0.26 & 42.15  & 41.71 \\
+        AdaBelief   & 90.23 ± 0.18  & 90.08 ± 0.18 & 41.65 & 41.72 \\
+        RMSProp     & 90.1 ± 0.12   & 89.5 ± 0.33  & 40.28 & 39.9\\
+        Apollo      & 91.88 ± 0.38 & \textbf{92.18} ± 0.18  & 45.84  & \textbf{44.32}    \\
+        ApolloW     & \textbf{92.03} ± 0.08 & 92.02 ± 0.17  & 45.31  & 43.96  \\
+        AdaHessian  & 91.64 ± 0.26    &  91.81 ± 0.55 &   \textbf{45.86}& 44.08  \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{Time (epochs) until convergence (see \ref{alg:convergence}) of the training loss across CIFAR-10 and TinyImageNet}
+    \label{tab:optimizer_comparison_ttc}
+    \begin{tabular}{lcccccccccccc}
+        \toprule
+        & \multicolumn{2}{c}{CIFAR-10} & \multicolumn{2}{c}{Tiny ImageNet} \\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5}  \cmidrule(lr){6-7} 
+        & \textbf{Milestone} & \textbf{Cosine}  & \textbf{Milestone} & \textbf{Cosine}    \\
+        \midrule
+        SGD         & 86 ± 5.0 & 113 ± 1.0 & 59 & 52 \\
+        Adam        & 94 ± 1.0 & 132 ± 1.0& 81 & 84  \\
+        AdamW       & 81 ± 0.0 & 112 ± 3.0& 45 & 59 \\
+        AdaBelief   & \textbf{81} ± 0.0  &  \textbf{108} ± 4.0& 45 & 60 \\
+        RMSProp     & \textbf{80} ± 0.0  & \textbf{108} ± 1.0& 45 & 58\\
+        Apollo      & 84 ± 1.0 & 125 ± 1.0& 56 & 60   \\
+        ApolloW     & 87 ± 1.0 & 137 ± 1.0& 57 & 60  \\
+        AdaHessian  & 88 ± 0.0 & 121 ± 2.0& 69 & 72 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+\subsection{Tiny ImageNet}
+For the second image classification dataset, we use Tiny ImageNet \cite{tiny_imagenet}.
+Tiny ImageNet is a more manageable subset of the well-known ImageNet dataset.
+It consists of 100,000 RGB images, each sized 64x64 pixels, across 200 different classes.
+For training, we again follow the configuration outlined by \emph{Apollo} \cite{apollo} and utilize a ResNet-18 model with approximately 11.7 million parameters. 
+We found that deeper ResNet architectures, like \emph{ResNet-50}, lead to significantly more overfitting during training.
+The training is conducted with a batch size of 256. We implement milestone decay, adjusting the 
+learning rate at epochs 40 and 80 by a factor of $\gamma=0.1$.
+The model is trained for 120 epochs, employing both milestone decay and cosine annealing strategies. Our strategy for hyperparameter evaluation remains consistent with those used for CIFAR-10. We first 
+test the optimizers' performance by evaluating the second-order optimizers on the optimal values of 
+the popular first-order optimizers. These settings are given in \ref{tab:tiny-real-comp}
+
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{cc}
+        \input{assets/chap2/tinyimagenet/step-lr-real-comp.tex} \\ 
+    \end{tabular}
+    \caption{Evaluation of optimizers on TinyImageNet using ResNet-18 with the \emph{milestone} learning rate scheduler, where hyperparameters
+    are held constant across all optimizers}
+    \label{fig:tinyimagenet-perf-milestone}
+\end{figure}
+
+As we can see in \ref{fig:tinyimagenet-perf-milestone} and \ref{fig:tinyimagenet-perf-cosine}, the performance of the second-order optimizers 
+largely follows the same regime as in \ref{fig:cifar-10-milestone-acc}. \emph{AdaHessian} and \emph{SGD} still aren't able to perform 
+well with their non-optimal hyperparameters. Although it shows that they both have a steadily decreasing test loss, 
+meaning they are able to prevent overfitting much better than \emph{AdamW} or \emph{AdaBelief}. 
+Referring to \ref{fig:tinyimagenet-perf-opt}, we can see that \emph{AdaHessian} still shows a high amount of performance variance 
+between its optimal and non-optimal hyperparameter settings, while \emph{Apollo} and \emph{ApolloW} have less variance in their performance. 
+As both second-order methods are able to reduce the amount of overfitting, especially in the later epochs (100-120), and therefore 
+achieve better generalization results, we could conclude that they are able to find flatter minima in the loss landscape, that
+are generally associated with better generalization \cite{Goodfellow-et-al-2016}.
+In terms of convergence behavior, we can see that although \emph{Apollo} and \emph{ApolloW} are able
+to converge faster than \emph{AdaHessian}, they are still considerably slower than \emph{AdamW} and \emph{AdaBelief} (see \ref{tab:optimizer_comparison_ttc}). 
+Therefore, we can conclude that, at least in its optimal setting, \emph{Apollo} is able to offer a reasonably good 
+trade-off between convergence time and generalization performance. Meanwhile, \emph{AdaHessian} is severely limited in its practical 
+applicability not only by its variability in performance, but also by its memory usage.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{cc}
+        \input{assets/chap2/tinyimagenet/cosine-real-comp.tex} \\ 
+    \end{tabular}
+    \caption{Evaluation of optimizers on TinyImageNet using ResNet-18 with the \emph{milestone} learning rate scheduler, where hyperparameters
+    are held constant across all optimizers}
+    \label{fig:tinyimagenet-perf-cosine}
+\end{figure}
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{cc}
+        \input{assets/chap2/tinyimagenet/cosine-second-order-best.tex } \\ 
+    \end{tabular}
+    \caption{Evaluation of optimizers on TinyImageNet using ResNet-18 with the \emph{cosine} learning rate scheduler, where hyperparameters
+    where hyperparameters are choosen optimally across all optimizers. For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$.}
+    \label{fig:tinyimagenet-perf-opt}
+\end{figure}
+
+\section{Machine Translation}
+For the task of machine translation, we utilize the MarianMT framework, specifically designed to train sequence-to-sequence translation models.
+The pre-built models in MarianMT are Transformer-based and share the same architecture
+as BART (Bidirectional and Auto-Regressive Transformers). In contrast to \emph{PyTorch's} \texttt{nn.Transformer} module,
+MarianMT abstracts not only the Encoder and Decoder blocks but also the positional encoding and embedding layers.
+Which makes it much easier to work with. Additionally, MarianMT provides a pre build tokenizer, which we use for our
+input sequences.
+\subsection{WMT-14}
+The WMT-14 (Workshop on Machine Translation 2014) is a benchmark dataset for machine translation tasks.
+It offers parallel texts in various language pairs, with German-English being particularly prominent.
+In out translation task we utilizes the German-English portion of the WMT-14 dataset, which contains about 4.5 Mio. sentence pairs.
+We utilize embedding layers with a dimensionality of $512$ for both input and output tokens.
+The Transformer consists of $3$ Encoder and $3$ Decoder blocks, each employing $8$ attention heads.
+Both the Encoder and Decoder incorporate feed-forward networks (FFN) with a hidden dimension of $512$.
+We evaluate our model's translation quality using the BLEU (Bilingual Evaluation Understudy) score, calculated with the \emph{sacrebleu} library.
+Our training procedure employs a batch size of $256$ and limits input sentences to a maximum length of $128$ tokens.
+For learning rate scheduling, we follow the original Transformer paper \cite{AttentionIsAllUNeed} and employ the \texttt{InverseSquareRootLR} function,
+which includes a warmup phase of 4,000 steps during which the learning rate increases linearly.
+Each optimizer was trained for 8 epochs which resulted in about 140k steps.
+The hyperparameters of each optimizer were carefully selected by evaluating the model on smaller datasets and comparing the performance of the optimizers.
+The final Hyperparameter settings are described in \ref{tab:wmt14-params}. In Figure \ref{fig:wmt14-perf-opt}, we can see that both in terms of convergence and generalization performance, 
+\emph{AdaBelief} produces the best results from the tested first order methods. While \emph{Apollo} and \emph{ApolloW} convergence marginally faster
+than \emph{Adam} and \emph{AdamW}, \emph{AdaBelief} is still performing slightly better in both domains. Only \emph{AdaHessian} demonstrates an ability to converge about one epoch faster
+and shows significantly better performance in terms of the \emph{BLEU score} when compared to \emph{AdaBelief}. However, \emph{AdaHessian} was about $2.5$ times slower than \emph{AdaBelief},
+diminishing its convergence advantage in terms of wall clock time.
+\emph{SGD} was able to converge and achieve decent results, although slower convergence speed is to be expected when training Transformer
+based models with \emph{SGD} \cite{dao2020understanding}.
+Regarding \emph{RMSProp}, we were unfortunately unable to find a suitable set of hyperparameters, even after extensive tuning.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{cc}
+        \input{assets/chap2/wmt14/loss.tex} \\ % Replace with the correct path to your .tex file
+        
+    \end{tabular}
+    \caption{Evaluation of optimizers on WMT-14 using the Transformer architecture with the \texttt{InverseSquareRootLR} learning rate scheduler.
+    Hyperparameters are individually tuned for optimal performance.}
+    \label{fig:wmt14-perf-opt}
+\end{figure}
+
+\begin{table}[h!]
+    \centering
+    \caption{Cost, Speed, and Memory Usage of Different Optimizers Across Various Datasets}
+    \label{tab:optimizer_comparison_perf}
+    \begin{tabular}{lcccccccccccc}
+        \toprule
+        & \multicolumn{2}{c}{CIFAR-10} & \multicolumn{2}{c}{Tiny ImageNet}  & \multicolumn{2}{c}{WMT-14} \\
+        \cmidrule(lr){2-3} \cmidrule(lr){4-5}  \cmidrule(lr){6-7} 
+        Cost (x SGD) & Speed & Memory  & Speed & Memory  & Speed & Memory  \\
+        \midrule
+        SGD         & 1.0 & 1.0 & 1.00 & 1.00 & 1.00 & 1.00  \\
+        Adam        & 1.0292 & 1.0112 & 1.0502 & 1.2192& 1.0217 & 1.02174 \\
+        AdamW       & 1.0317 & 1.0112 & 1.0458& 1.2151 &  1.0299 & 1.02993 \\
+        AdaBelief   & 1.0402 & 1.0112 & 1.0581 & 1.2273 & 1.0389 & 1.03895 \\
+        RMSProp     & 1.0213 & 1.0 & 1.0274 & 1.0079 & - & - \\
+        Apollo      & 1.1337 & 1.0223 & 1.1616 & 1.4313 & 1.1167 & 1.11669  \\
+        ApolloW     & 1.1359 & 1.0223 & 1.1556 & 1.4336 & 1.1183& 1.11828   \\
+        AdaHessian  & \textbf{2.6654} &\textbf{3.6443}& \textbf{1.9098}  & \textbf{2.7969} & \textbf{2.6121} &\textbf{1.716}\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+
