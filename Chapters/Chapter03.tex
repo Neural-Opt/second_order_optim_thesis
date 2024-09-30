@@ -73,9 +73,11 @@ earlier discovery of local minima, which are suboptimal, whereas optimizers like
 However, as we observed in the benchmarks on \emph{CIFAR-10} and \emph{WMT-14}, both \emph{AdaHessian} and \emph{Apollo} are able to discover minima that generalize well.
 This leads to the hypothesis that the better generalization performance of the tested second-order
 methods may not be solely based on superior Hessian approximation capabilities,
-but rather on other mechanisms that have yet to be uncovered. In conclusion, our analysis shows that \emph{Apollo} is not competitive with standard first-order methods in terms of curvature approximation ability,
-at least within the context of our small testing network. However, \emph{Apollo} still manages to outperform first-order optimizers with respect to generalization performance.
-Given that the increase in resource consumption for \emph{Apollo} is relatively modest, it may be a suitable option when maximal test performance is prioritized over faster convergence.
+but rather on other mechanisms that have yet to be uncovered.
+We will undermine this oberservation by uncovering several flaws in \emph{Apollo}, both theoretical and practical,
+including issues related to its implementation in the next section.
+In conclusion, our analysis shows that \emph{Apollo} is not competitive with standard first-order methods in terms of curvature approximation ability,
+at least within the context of our small testing network.
 Furthermore, since \emph{AdaHessian} requires 2 to 3 times the memory of \emph{SGD} (see Table \ref{tab:optimizer_comparison_perf})
 and due to PyTorch's current inability to work with gradient graphs on \emph{DDP}, training large, distributed models becomes infeasible.
 Therefore, one might conclude that the approximation of \emph{AdaHessian} is unlikely to find widespread application over existing first-order methods.
@@ -112,80 +114,79 @@ Therefore, one might conclude that the approximation of \emph{AdaHessian} is unl
     \label{fig:loss-big-batch}
 \end{figure}
 
-
-
 \comment{
-\section{Optimizer Behavior in Parameter Space}
-To gain deeper insight into how different second-order approximations influence the movement of optimizers
-through the parameter space, we will define several metrics whose evolution we will plot over the entire training
-duration.
-\subsection{Step Length}
-To measure how the step length in the parameter space develops over time,
-we will record $\alpha$, where $\alpha = \lVert \Delta \theta \rVert_2$ and $\Delta \theta = \theta_t - \theta_{t-1}$, $t \in \mathbb{N}$.
-\subsection{Distance Traveled}
-To measure the exploration ability of the parameter space by each optimizer,
-we introduce $\beta$, where $\beta = \lVert \theta_{t} - \theta_{0} \rVert_2$, $t \in \mathbb{N}$.
-This metric indicates how far the optimizer has traveled from its initial point to the
-current point in time.
-\subsection{Step Oscillations}
-To measure how much the optimizers oscillate between steps, we measure the angle between two successive update steps. We define this angle $\gamma$ as
-\[
-    \gamma = \arccos\left(\frac{\langle \Delta \theta_t, \Delta \theta_{t-1} \rangle}{\lVert \Delta \theta_t \rVert \cdot \lVert \Delta \theta_{t-1} \rVert}\right),
-\]
-where 
-\[
-    \Delta \theta_{t} =  \theta_{t} -  \theta_{t-1}, \quad \Delta \theta_{t-1} =  \theta_{t-1} -  \theta_{t-2}.
-\]
-\subsection{Sharpness of Minima}
-To measure the sharpness of the minima found by the optimizers during training, we focus on the curvature of these minima. 
-Minima with flatter curvature are generally associated with better generalization performance because small changes in the input are less likely to significantly affect the output of the loss function.
-To quantify this, we define the metric \( \phi \) as 
-\[
-    \phi =  \frac{1}{n}\sum_{i=0}^{n} \left| \frac{\partial^2 \mathcal{L}}{\partial \theta_{ii}} \right|.
-\]
-This metric, \( \phi \), provides a measure of the absolute mean curvature at a given point in the parameter space.
-A lower value of \( \phi \) indicates flatter minima, which are typically associated with better generalization.
-In contrast, a higher \( \phi \) value corresponds to sharper minima.
-\subsection{Results}
+    \begin{python}
+        (...)
+        bias_correction = 1 - beta ** state['step']
+        alpha = (1 - beta) / bias_correction
+    
+        # calc the diff grad
+        delta_grad = grad - exp_avg_grad
+        rebound = 0.01
+        eps = eps / rebound
+    
+        
+        # Update the running average grad
+        exp_avg_grad.add_(delta_grad, alpha=alpha)
+        denom = d_p.norm(p=4).add(eps)
+        d_p.div_(denom)
+        v_sq = d_p.mul(d_p)
+        delta = delta_grad.div_(denom).mul_(d_p).sum().mul(-alpha) - B.mul(v_sq).sum()
+        # Update B
+        B.addcmul_(v_sq, delta)
+        # calc direction of parameter updates
+        denom = B.abs().clamp_(min=rebound)
+        d_p.copy_(exp_avg_grad.div(denom))
+    
+        # Perform step weight decay
+        (...)
+        p.add_(d_p, alpha=-curr_lr)
+        \end{python}
+           
 }
-
-
-
-\comment{\section{The SApollo Optimizer}
+ 
+\section{The SApollo Optimizer}
 As we noted in the previous section, the approximation quality of the batch Hessian in \emph{Apollo} is not competitive with existing first-order methods.
-However, an interesting new investigation could involve smoothing the calculated Hessian diagonal in \emph{Apollo}.
-As we recall from Apollo's Algorithm \ref{alg:apollo}, $B_t$ represents the Hessian diagonal that it outputs.
-Unlike other optimizers, \emph{Apollo} does not smooth these approximations of $B_t$ over multiple steps to reduce variance.
-The authors themselves suggest that investigating the moving average of the diagonal $B_t$ might be a promising direction for future work \cite{apollo}.
-In the following, we will explore this by applying an \emph{EMA} (Exponential Moving Average) to smooth $B_t$ and investigate the consequences on Hessian approximation quality and the converge of the loss.
-We will call this \emph{SApollo} (\textbf{S}moothedApollo) \ref{alg:Sapollo}.
+In this section, we will examine several flaws arising from the formulation and implementation of the \emph{Apollo} algorithm (see Algorithm \ref{alg:apollo}).
+We will then address both theoretical and practical issues, aiming to resolve these errors in the algorithm's design and implementation.
+We begin by demonstrating that \textbf{Theorem 1} in \emph{Apollo} \cite{apollo} does not hold,
+which may cause the algorithm to behave similarly to \emph{SGD} with momentum, thereby explaining its poor curvature approximation abilities.\\
 
-\marginpar{\cite{apollo}}
-\label{alg:Sapollo}
-\begin{algorithm}
-    \caption{SApollo}
-    \begin{algorithmic}[1]
-    \State \textbf{Initial:} $m_0, d_0, B_0, v_0 \leftarrow 0, 0, 0,0$ \Comment{Initialize $m_0, d_0, B_0$ to zero}
-    \State Good default settings are $\beta_1 = 0.9,\boldsymbol{\beta_2 = 0.999}$ and $\epsilon = 10^{-4}$
-    \While{$t \in \{0, \ldots, T\}$}
-        \For{$\theta \in \{\theta_1, \ldots, \theta_L\}$}
-            \State $g_{t+1} \leftarrow \nabla f_t(\theta_t)$ \Comment{Calculate gradient at step $t$}
-            \State $m_{t+1} \leftarrow \frac{\beta_1(1-\beta_1^t)}{1-\beta_1^{t+1}}m_t + \frac{1-\beta_1}{1-\beta_1^{t+1}}g_{t+1}$ \Comment{Bias-corrected EMA}
-            \State $\alpha \leftarrow \frac{d_t^T(m_{t+1}-m_t)+d_t^TB_td_t}{(\|d_t\|_4+\epsilon)^4}$ \Comment{Calculate coefficient of $B$ update}
-            \State $B_{t+1} \leftarrow B_t - \alpha \cdot \text{Diag}(d_t^2)B_{t+1} $ \Comment{Update diagonal Hessian}
-            \State $\boldsymbol{v_{t+1} \leftarrow \beta_2 v_t + (1-\beta_2)B_{t+1}}$ \Comment{\textbf{Update EMA of B}}
-            \State $\boldsymbol{\hat{v}_{t+1} \leftarrow \frac{v_t}{1-\beta_2^{t+1}}}$ \Comment{\textbf{Bias-corrected EMA}}
-
-            \State $D_{t+1} \leftarrow \text{rectify}(\boldsymbol{\hat{v}_{t+1}}, 0.01)$ \Comment{Handle nonconvexity}
-            \State $d_{t+1} \leftarrow D_{t+1}^{-1}m_{t+1}$ \Comment{Calculate update direction}
-            \State $\theta_{t+1} \leftarrow \theta_t - \eta_{t+1}d_{t+1}$ \Comment{Update parameters}
-        \EndFor
-    \EndWhile
-    \State \textbf{return} $\theta_T$
-    \end{algorithmic}
-    \end{algorithm}
-
-\section{Optimizer Behaviour Visualization}
-
-\section{Hessian Diagonal in FFN's}
+\noindent\textbf{Theorem 1 (Coupled Stepsize and Convexity (from \cite{apollo})).} 
+\textit{Given zero initialization of $m_0$, $d_0$, and $B_0$ and a fixed parameter intialization
+$\theta_0$. Suppose that we have two sets of hyper-parameters $\eta$, $\sigma$ and $\eta'$, $\sigma'$ with the same ratio:
+$\frac{\eta}{\sigma} = \frac{\eta'}{\sigma'}$. Then the convergence trajectories of these two sets of hyper-parameters are exactly
+the same:
+        \[ \theta_{t} = \theta'_{t}, \quad t \in \{1,\cdots,T \}\]
 }
+The paper adopts an inductive approach for this proof, where they define the invariant as 
+\begin{equation}
+    m_t = m'_t, \quad B_t = \alpha B'_t, \quad \theta_t = \theta'_t$, with $\alpha = \frac{\eta'}{\eta} = \frac{\sigma'}{\sigma} \quad \forall t.
+\end{equation}
+As the error lies in the formulation of the inital step of the induction, we will refer to the paper\cite{apollo} for the inductive step. 
+They formulate the  inital step  as follows:
+When $t = 1$, since $\theta_0 = \theta'_0$, we have $m_1 = m'_1$. With $d_0 = d'_0 = 0$, we have $B_1 = B'_1 = 0$, and:
+\[
+D_1 = \text{rectify}(B_1, \sigma) = \sigma
+\]
+\[
+D'_1 = \text{rectify}(B'_1, \sigma') = \sigma'
+\]
+Thus, $D'_1 = \alpha D_1$, and:
+\[
+\theta'_1 = \theta'_0 - \eta' D'^{-1}_1 m'_1 = \theta_0 - \eta \alpha (D_1^{-1} / \alpha) m_1 = \theta_0 - \eta D_1^{-1} m_1 = \theta_1.
+\]
+However, as seen from the formulation of the $B$ update in Algorithm \ref{alg:apollo}, $B_1 = B'_1$ only holds if $m_1 = 0$,
+which is generally not the case. Consequently, $D'_1 \neq \alpha D_1$, and therefore $\theta'_1 \neq \theta_1$.
+This implies that the clamping effect, due to the choice of $\sigma$ in \emph{Apollo}, cannot be rescaled by adjusting the learning rate. 
+This is expected, as the clamping operation is inherently non-linear.
+In practice, this results in small values being capped by $\sigma$, which effectively leads to a rescaling of the learning rate by a 
+factor of $\frac{1}{\sigma}$, disregarding any curvature information at that point. Thus, the higher the choice of $\sigma$,
+the more similar \emph{Apollo}'s update step becomes to plain \emph{SGD} with momentum.
+This phenomenon occurred in Figure \ref{fig:cosine-bias-big-batch}, where most values of $B$ were much smaller than the chosen $\sigma$,
+leading to a loss of curvature information.
+
+
+
+
+

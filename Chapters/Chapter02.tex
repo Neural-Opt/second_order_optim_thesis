@@ -192,14 +192,14 @@ which also limits the use of \emph{AdaHessian} in practice.
         \cmidrule(lr){2-3} \cmidrule(lr){4-5}  \cmidrule(lr){6-7} 
         & \textbf{Milestone} & \textbf{Cosine}  & \textbf{Milestone} & \textbf{Cosine}    \\
         \midrule
-        SGD         & 87.2 ± 0.86  & 88.17 ± 0.3 & 44.73  & 38.56  \\
-        Adam        & 90.8 ± 0.39   & 90.32 ± 0.08  & 44.08 & 43.44    \\
-        AdamW       & 90.35 ± 0.06  & 89.99 ± 0.26 & 42.15  & 41.71 \\
-        AdaBelief   & 90.23 ± 0.18  & 90.08 ± 0.18 & 41.65 & 41.72 \\
-        RMSProp     & 90.1 ± 0.12   & 89.5 ± 0.33  & 40.28 & 39.9\\
-        Apollo      & 91.88 ± 0.38 & \textbf{92.18} ± 0.18  & 45.84  & \textbf{44.32}    \\
-        ApolloW     & \textbf{92.03} ± 0.08 & 92.02 ± 0.17  & 45.31  & 43.96  \\
-        AdaHessian  & 91.64 ± 0.26    &  91.81 ± 0.55 &   \textbf{45.86}& 44.08  \\
+        SGD         & 87.2 ± 0.86  & 88.17 ± 0.3 & 39.32  & 38.56  \\
+        Adam        & 90.8 ± 0.39   & 90.32 ± 0.08  & 43.06 & 43.44    \\
+        AdamW       & 90.35 ± 0.06  & 89.99 ± 0.26 & 42  & 41.71 \\
+        AdaBelief   & 90.23 ± 0.18  & 90.08 ± 0.18 & 41.88 & 41.72 \\
+        RMSProp     & 90.1 ± 0.12   & 89.5 ± 0.33  & 39.4 & 39.9\\
+        Apollo      & 91.88 ± 0.38 & \textbf{92.18} ± 0.18  & \textbf{44.96}  & \textbf{44.32}    \\
+        ApolloW     & \textbf{92.03} ± 0.08 & 92.02 ± 0.17  & 43.06  & 43.96  \\
+        AdaHessian  & 91.64 ± 0.26    &  91.81 ± 0.55 &  44.28& 44.08  \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -214,14 +214,14 @@ which also limits the use of \emph{AdaHessian} in practice.
         \cmidrule(lr){2-3} \cmidrule(lr){4-5}  \cmidrule(lr){6-7} 
         & \textbf{Milestone} & \textbf{Cosine}  & \textbf{Milestone} & \textbf{Cosine}    \\
         \midrule
-        SGD         & 86 ± 5.0 & 113 ± 1.0 & 59 & 52 \\
-        Adam        & 94 ± 1.0 & 132 ± 1.0& 81 & 84  \\
-        AdamW       & 81 ± 0.0 & 112 ± 3.0& 45 & 59 \\
-        AdaBelief   & \textbf{81} ± 0.0  &  \textbf{108} ± 4.0& 45 & 60 \\
-        RMSProp     & \textbf{80} ± 0.0  & \textbf{108} ± 1.0& 45 & 58\\
-        Apollo      & 84 ± 1.0 & 125 ± 1.0& 56 & 60   \\
-        ApolloW     & 87 ± 1.0 & 137 ± 1.0& 57 & 60  \\
-        AdaHessian  & 88 ± 0.0 & 121 ± 2.0& 69 & 72 \\
+        SGD         & 86 ± 5.0 & 113 ± 1.0 & 44 & \textbf{52} \\
+        Adam        & 94 ± 1.0 & 132 ± 1.0& 57 & 84  \\
+        AdamW       & 81 ± 0.0 & 112 ± 3.0& \textbf{40} & 59 \\
+        AdaBelief   & 81 ± 0.0  &  \textbf{108} ± 4.0& \textbf{40} & 60 \\
+        RMSProp     & \textbf{80} ± 0.0  & \textbf{108} ± 1.0& \textbf{40} & 58\\
+        Apollo      & 84 ± 1.0 & 125 ± 1.0& 42 & 60   \\
+        ApolloW     & 87 ± 1.0 & 137 ± 1.0& 43 & 60  \\
+        AdaHessian  & 88 ± 0.0 & 121 ± 2.0& 53 & 72 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -248,7 +248,7 @@ the popular first-order optimizers. These settings are given in \ref{tab:tiny-re
 \end{figure}
 
 As we can see in \ref{fig:tinyimagenet-perf-milestone} and \ref{fig:tinyimagenet-perf-cosine}, the performance of the second-order optimizers 
-largely follows the same regime as in \ref{fig:cifar-10-milestone-acc}. \emph{AdaHessian} and \emph{SGD} still aren't able to perform 
+largely follows the same regime as in \ref{fig:cifar-10-milestone-real} and \ref{fig:cifar-10-milestone-second-best}. \emph{AdaHessian} and \emph{SGD} still aren't able to perform 
 well with their non-optimal hyperparameters. Although it shows that they both have a steadily decreasing test loss, 
 meaning they are able to prevent overfitting much better than \emph{AdamW} or \emph{AdaBelief}. 
 Referring to \ref{fig:tinyimagenet-perf-opt}, we can see that \emph{AdaHessian} still shows a high amount of performance variance 
@@ -265,10 +265,10 @@ applicability not only by its variability in performance, but also by its memory
 \begin{figure}[h!]
     \centering
     \begin{tabular}{cc}
-        \input{assets/chap2/tinyimagenet/cosine-real-comp.tex} \\ 
+        \input{assets/chap2/tinyimagenet/step-lr-second-order-best.tex} \\ 
     \end{tabular}
     \caption{Evaluation of optimizers on TinyImageNet using ResNet-18 with the \emph{milestone} learning rate scheduler, where hyperparameters
-    are held constant across all optimizers}
+    where hyperparameters are choosen optimally across all optimizers. For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$.}
     \label{fig:tinyimagenet-perf-cosine}
 \end{figure}
 \begin{figure}[h!]

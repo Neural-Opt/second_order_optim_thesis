@@ -200,7 +200,7 @@ if too small, progress will be slow, requiring many iterations to reach converge
 
 \marginpar{\cite{bottou2018optimization}}
 In machine learning, optimization problems naturally arise due to the formulation of prediction models and the associated loss functions.
-These are typically used to evaluate measures like the expected and \emph{empirical risk}, which practitioners aim to minimize \cite{bottou2018optimization}.
+These are typically used to evaluate measures like the \emph{expected} and \emph{empirical risk}, which practitioners aim to minimize \cite{bottou2018optimization}.
 To formalize this, let's define a family of model functions for some given \( f(\cdot; \cdot) : \mathbb{R}^{d_x} \times \mathbb{R}^d \to \mathbb{R}^{d_y} \) as follows:
 \begin{align}
 \mathbb{F} := \{ f(\cdot; \theta) : \theta \in \mathbb{R}^d \}.
@@ -208,15 +208,13 @@ To formalize this, let's define a family of model functions for some given \( f(
 
 \marginpar{\cite{bottou2018optimization}}
 The set \(\mathbb{F}\) represents a collection of functions parameterized by a parameter vector \( w \) that determine the prediction functions in use.
-Now assume a loss function \( l : \mathbb{R}^{d_y} \times \mathbb{R}^{d_y} \to \mathbb{R} \), which, given an input-output pair \((x, y)\), yields the loss \( l(f(x; w), y) \).
+Now assume a loss function \( l : \mathbb{R}^{d_y} \times \mathbb{R}^{d_y} \to \mathbb{R} \), which, given an input-output pair \((x, y)\) and a model $f \in \mathbb{F}$, yields the loss \( l(f(x; w), y) \).
 The most gratifying behavior for such a prediction function is to minimize the expected loss between any input-output pair.
 For that, let's assume that losses are measured with respect to a probability distribution $P(x,y)$ with $ P : \mathbb{R}^{d_x} \times \mathbb{R}^{d_y} \to [0, 1] $,
-then we could write the expected loss as
+then we could write the \emph{expected risk} as
 \begin{align}
 R(\theta) = \int_{\mathbb{R}^{d_x} \times \mathbb{R}^{d_y}} l(f(x; \theta), y) dP(x, y) = \mathbb{E}[l(f(x; \theta), y)].
 \end{align}
-
-Where $R(\theta)$ is also called the \emph{expected risk} of a model $f$ given the parameter vector $\theta$. 
 \marginpar{\cite{bottou2018optimization}}
 Minimization of $R(\theta)$ would ensure that the expected loss for the resulting model $f(\cdot; w) $ over all possible $(x, y)$ is minimal.\\
 In practice, however, this is unfeasible when one lacks complete information about $P$.
@@ -244,9 +242,9 @@ Since standard gradient descent requires the evaluation of the gradient over the
 computationally expensive.
 Another issue with standard gradient descent optimization methods is that they don’t give an easy way to incorporate new data in an 'online' setting.
  Stochastic Gradient Descent (SGD) addresses both of these issues by following the negative gradient of the objective after seeing only a single or a few training examples.
- Therefore approximating the true gradient of $ R_n(\theta_t)$ by the gradient of a single or a few data points.
+ Therefore approximating the true gradient of $ R_n(\theta_t)$ by the gradient of a single or a few data points  \(B \subseteq  \{ (x_i, y_i) \}_{i=1}^{n} \subseteq \mathbb{R}^{d_x} \times \mathbb{R}^{d_y}\).
 \begin{align}
-{\nabla} R_b(\theta) = \frac{1}{|B|} \sum_{i \in B} \nabla  l(f(x_i; \theta), y_i),
+    \nabla R_b(\theta) = \frac{1}{|B|} \sum_{\{\hat{x}, \hat{y}\} \in B} \nabla l(f(\hat{x}; \theta), \hat{y})
 \end{align}
     with $B \in \mathbb{N}$ beeing the sample size or \emph{batch size}.
  Leading to the following update rule \cite{stanfordSGD}
@@ -512,6 +510,7 @@ with which we finally arrive at the claim
 \end{equation}
 
 \subsection{DFP \& BFGS}
+\marginpar{\cite{nocedal2006numerical}}
 \label{sec:bfgs}
 Now that we know why the Hessian is a very useful quantity for optimization, we will take a look at how we can approximate it,
 as exact calculation is infeasible for most large-scale problems.
@@ -531,7 +530,7 @@ where $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ and $s_k = x_{k+1} - x_k$.
 We cover the derivation of these in full detail in \ref{sec:apollo}.
 By multiplying the above with $s_k^T$, we can conclude, that if $s_k^T y_k > 0$,
 known as the \emph{curvature condition}, holds, there exists a $\mathbf{B}_k$ with positive curvature along $s_k$,
-meaning $s_k^T\mathbf{B}_k s_k > 0$.
+meaning $s_k^T\mathbf{B}_k s_k > 0$ (see \ref{sec:matrix_definiteness}).
 \begin{equation}
     \mathbf{B}_{k+1} = \min_{B} \|B - \mathbf{B}_k\| \\
     \text{s.t. }   B = B^T, \; Bs_k = y_k 
@@ -969,8 +968,6 @@ Algorithm \ref{alg:backprop} provides an overview of the backpropagation algorit
     \State Initialize weights $W$ and biases $b$ randomly
     \Repeat
         \ForAll{training example $(x^{(i)}, y^{(i)})$}
-            \State \textbf{Forward Pass:}
-            \State Compute activations for each layer
             \State \textbf{Compute Loss:}
             \State Compute loss $L(y, \hat{y}^{(M)})$
             \State \textbf{Backward Pass:}

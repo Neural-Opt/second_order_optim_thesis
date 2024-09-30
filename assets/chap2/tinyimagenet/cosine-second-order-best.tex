@@ -4003,6 +4003,47 @@
     119 1.73666546759696
     };
     \end{groupplot}
+    \node at (7,7.5) [anchor=north] {
+    \begin{tikzpicture}[scale=0.75] % Nested TikZ environment
+        \small 
+        % AdaBelief
+ \draw[red,  ultra thick] (0,0) -- ++(0.8,0);
+ \node[anchor=west] at (1,0) {{Apollo}}; % Increased spacing
+ 
+ % Adam
+ \draw[darkorange25512714,  ultra thick] (3.75,0) -- ++(0.8,0);
+ \node[anchor=west] at (4.75,0) {{Adam}}; % Increased spacing
+ 
+ % AdaHessian
+ \draw[forestgreen4416044,  ultra thick] (6.7,0) -- ++(0.8,0);
+ \node[anchor=west] at (7.7,0) {{AdaBelief}}; % Increased spacing
+ 
+ % Apollo
+ \draw[grey127,  ultra thick] (11,0) -- ++(0.8,0);
+ \node[anchor=west] at (11.9,0) {{RMSProp}}; % Increased spacing
+    \end{tikzpicture}
+};
+\node at (6.86,8) [anchor=north] {
+    \begin{tikzpicture}[scale=0.75] % Nested TikZ environment
+        \small 
+        % AdaBelief
+ \draw[mediumpurple148103189,  ultra thick] (0,0) -- ++(0.8,0);
+ \node[anchor=west] at (1,0) {{ApolloW}}; % Increased spacing
+ 
+ % Adam
+
+ \draw[orchid227119194,  ultra thick] (3.75,0) -- ++(0.8,0);
+ \node[anchor=west] at (4.75,0) {{SGD}}; % Increased spacing
+ 
+ % AdaHessian
+ \draw[sienna1408675,  ultra thick] (6.7,0) -- ++(0.8,0);
+ \node[anchor=west] at (7.7,0) {{AdaHessian}}; % Increased spacing
+ 
+ % Apollo
+ \draw[steelblue31119180,  ultra thick] (11,0) -- ++(0.8,0);
+ \node[anchor=west] at (11.9,0) {{AdamW}}; % Increased spacing
     
+\end{tikzpicture}
+};
     \end{tikzpicture}
     
