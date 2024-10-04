@@ -3,7 +3,7 @@
 In this work, we examined \emph{Apollo} and \emph{AdaHessian}, two recent advancements in the field of second-order optimization for neural network training.
 We evaluated both optimizers in terms of performance on common datasets and resource consumption,
 compared to first-order methods. While \emph{AdaHessian} demonstrated strong performance in approximating the batch Hessian diagonal,
-its significant resource requirements and the need for gradient graph creation in PyTorch make it impractical for non-academic use. 
+its significant resource requirements and the need for derivative graph creation in PyTorch make it impractical for non-academic use. 
 On the other hand, \emph{Apollo}, though able to perform similarly to \emph{AdaHessian} in our experiments,
 exhibited a significant limitation in its Hessian approximation due to its clamping operation,
 which loses curvature information when values fall below $\sigma$.

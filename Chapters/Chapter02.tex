@@ -50,7 +50,7 @@ To prevent outliers from distorting the results, we rely on short-term intervals
     \label{alg:convergence}
 
     \begin{algorithmic}[1]
-    \State \textbf{Input:} Loss array \texttt{data}, treshold \texttt{T}$=\frac{1}{100}$, window size $\sigma=5$
+    \State \textbf{Input:} Loss array \texttt{data}, treshold \texttt{T}$=\frac{\texttt{data}[0]}{100}$, window size $\sigma=5$
     \State \textbf{Initialize:} $ \text{old\_mean} \gets mean(\texttt{data}[ \lvert \texttt{data}\rvert -\sigma :] )$ 
     \For{$i = n-\sigma, n-\sigma, \dots, 0$ }
     \State $ \text{new\_mean} \gets  mean(\texttt{data}[i:i+\sigma]) $
@@ -184,7 +184,7 @@ which also limits the use of \emph{AdaHessian} in practice.
 
 \begin{table}[h!]
     \centering
-    \caption{Accuracy (\%) of different optimizers across CIFAR-10 and TinyImageNet, evaluated on 3 runs}
+    \caption{Accuracy (\%) of different optimizers across CIFAR-10 and TinyImageNet, evaluated on 3 runs (CIFAR-10)}
     \label{tab:optimizer_comparison_acc}
     \begin{tabular}{lcccccccccccc}
         \toprule

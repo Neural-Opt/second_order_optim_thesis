@@ -627,12 +627,11 @@ Given this result, we can apply the same convergence analysis as in \ref{sec:new
 To mitigate the inherent stochastic variance associated with this approximation, AdaHessian employs two key strategies.
 First, it maintains an Exponential Moving Average (EMA) of the diagonal estimates $D$.
 Second, AdaHessian implements a spatial averaging algorithm. Consider a Convolutional Neural Network (CNN) as an example. In a CNN, for a convolutional kernel with block size $b$ (for instance, $b = 9$ for a $3 \times 3$ kernel), we perform spatial averaging among the kernel's parameters.
-This can be mathematically expressed as:
-\marginpar{\cite{yao2021adahessian}}
+This can be mathematically expressed as,
 \begin{equation}
     \label{eq:spatial-average}
     D^{(s)}[ib+j] = \frac{1}{b} \sum_{k=1}^b D[ib + k], \quad \text{for } 1 \leq j \leq b, \; 0 \leq i \leq \left\lfloor\frac{d}{b}\right\rfloor - 1,
-\end{equation}
+\end{equation}\cite{yao2021adahessian}
 where $d$ is the number of model parameters.After applying the spatial averaging, we can define the second momentum of AdaHessian with
 \begin{equation}
     \label{eq:hessian-ema}
@@ -640,7 +639,7 @@ where $d$ is the number of model parameters.After applying the spatial averaging
 \end{equation}
 Here, $\bar{D}_t$ represents the smoothed estimate of the squared Hessian diagonal at time step $t$, $\beta_2$ is the exponential decay rate for the second moment estimate, and $D_{(s)}$ is the spatially averaged Hessian diagonal estimate.
 As mentioned earlier, the rest of AdaHessian functions exactly analogous to Adam (see \ref{sec:adam}), leading to the
-algorithm described in \ref{alg:adahessian}. \cite{yao2021adahessian}
+algorithm described in \ref{alg:adahessian} \cite{yao2021adahessian}.
 \begin{algorithm}
     \caption{AdaHessian}
     \label{alg:adahessian}
@@ -666,7 +665,7 @@ algorithm described in \ref{alg:adahessian}. \cite{yao2021adahessian}
     \end{algorithmic}
     \end{algorithm}
     
-\subsection{Apollo}
+\subsection{Apollo \cite{apollo}}
 \label{sec:apollo}
 \emph{Apollo} \cite{apollo} is a rather newly proposed quasi-Newton algorithm for non-convex stochastic
 optimization. It operates by calculating a non-singular diagonal approximation  of the Hessian matrix,
@@ -721,7 +720,7 @@ is a vector-valued function. For such functions, the \emph{mean value theorem}â€
 Therefore, we apply the scalar product with $s_t^T$ to weaken the condition. This relaxes the equality requirement to hold only in the direction of $s_t$.
 \begin{equation}
     \label{eq:weak-secant-eq}
-    \mathbf{B}_{t+1} = argmin_{\mathbf{B}} \|\mathbf{B} - \mathbf{B}_t\|, \\
+    \mathbf{B}_{t+1} = argmin_{\mathbf{B}} \|\mathbf{B} - \mathbf{B}_t\|_F, \\
     \text{s.t. } \mathbf{s}^T_t \mathbf{B}_{t+1}\mathbf{s}_t =\mathbf{s}^T_t \mathbf{y}_t.
 \end{equation}
 This optimization problem can be solved by an approach first proposed in \cite{Zhu1999TheQR},
@@ -747,7 +746,7 @@ with $\sigma \geq 0$.
 This approach achieves two key objectives: First, it ensures that small steps are taken in regions of very high curvature (sharp edges),
 as \( |\mathbf{B_t}| \) becomes large in those cases, and that larger steps are taken when \( |\mathbf{B_t}| \) is low, although not excessively large, since saddle points are common in the loss landscape.
 Secondly, it guarantees that \( \mathbf{D_t} \) has no zero-valued diagonal elements, ensuring that it remains non-singular.
-In practice \emph{Apollo} chooses $\sigma=0.01$, although this can be tuned as a hyperparameter.\cite{apollo}
+In practice \emph{Apollo} chooses $\sigma=0.01$.\cite{apollo}
 
 \marginpar{\cite{apollo}}
 \label{alg:apollo}
@@ -789,10 +788,9 @@ make predictions, and solve complex problems across various domains, effectively
 In this section, we discuss the architecture and some of the underlying theory behind neural networks, including the algorithms used for training.
 We will explore how neural networks are structured, the roles of different layers, and how information flows through them.
 Additionally, we will delve into the principles and methods behind training algorithms like backpropagation, which adjust the network's weights to improve its predictive accuracy.
-\subsection{The artificial Neuron}
+\subsection{The artificial Neuron \cite{GrundkursAI}}
 \label{sec:neuron}
 
-\marginpar{\cite{GrundkursAI}}
 A neuron in an artificial neural network is modeled as a mathematical function that processes input signals and produces an output. The basic structure is as follows:
 \[
 y_j = f \left( \sum_{i=1}^{n} \theta_i x_i + b \right).
@@ -813,9 +811,9 @@ The sum is then fed into a non linear activation function $f$.
 This function is modeled on the idea that the activity of real biological neurons depends on a certain activation threshold\cite{GrundkursAI}.
 Activation functions that are commonly used in practice are the \textbf{sigmoid-function}  $f(z) = \frac{1}{1 + e^{-z}}$ or \textbf{ReLU} (Rectified Linear Unit) $f(z) = \max(0, z)$\cite{nair2010rectified}.
 The \emph{bias term} $b$ helps adjust the output by shifting the activation function horizontally.
-This allows the neuron to represent patterns that are not centered around the origin, making it able to better approximate a hyperplane.\cite{GrundkursAI}
+This allows the neuron to represent patterns that are not centered around the origin, making it able to better approximate a hyperplane\cite{GrundkursAI}.
 
-\subsection{The Multi-Layer Perceptron (MLP)}
+\subsection{The Multi-Layer Perceptron (MLP)\cite{Goodfellow-et-al-2016}}
 \label{sec:mlp}
 
 A single neuron is limited in its ability to distinguish between linearly separable data points, as its mathematical formulation models a hyperplane. Consequently, it cannot represent the output of an XOR (exclusive OR) gate.
@@ -823,7 +821,7 @@ This is because the XOR function is not linearly separable.\cite{Goodfellow-et-a
 To overcome this limitation, the Multilayer Perceptron (MLP) was introduced.
 An MLP consists of multiple stacked layers of single perceptrons (neurons with an activation function).
 Each layer takes an input, processes it through its perceptrons, and outputs a vector that can then be fed into the next perceptron layer.
-This structure enables the MLP to handle complex, non-linearly separable data, such as the XOR function.\cite{Goodfellow-et-al-2016}
+This structure enables the MLP to handle complex, non-linearly separable data, such as the XOR function \cite{Goodfellow-et-al-2016}.
 The output of an MLP layer can be mathematically expressed as:
 \[
 x^{(l)} = f \left( \theta^{(l)} x^{(l-1)} + b^{(l)} \right),
@@ -847,7 +845,6 @@ This vector is then fed into a non-linear activation function, whose output is t
 It is easy to see why the activation function must be non-linear.
 If the activation functions were linear, the stacked MLP layers would collapse into a single layer,
 rendering the model unable to fit complex, highly non-linear data.\cite{Goodfellow-et-al-2016}
-\marginpar{\cite{Goodfellow-et-al-2016}}
 
 The MLP falls into the category of feedforward neural networks, meaning that the flow of information is unidirectional,
 from one layer to the next. Each layer passes its information forward to the subsequent layer.
@@ -892,7 +889,7 @@ The algorithm used for this process will be the topic of the next section.
 }
 
 
-\subsection{Training of Neural Networks}
+\subsection{Training of Neural Networks \cite{Goodfellow-et-al-2016}}
 \label{sec:nn_training}
 
 The goal of training is to find a set of parameters such that the neural network minimizes a particular cost function.
@@ -976,7 +973,7 @@ Algorithm \ref{alg:backprop} provides an overview of the backpropagation algorit
     \Until{convergence}
     \end{algorithmic}
     \end{algorithm}
-\marginpar{\cite{Goodfellow-et-al-2016}}
+\marginpar{Taken from \cite{Goodfellow-et-al-2016}}
 In addition to the gradient calculation and optimization steps, there are many other factors that determine the success of training a neural network.
 A crucial aspect of training a neural network is finding a good set of values for the hyperparameters,
 as most deep learning algorithms come with several hyperparameters that control various aspects of the algorithm's behavior.
@@ -998,8 +995,8 @@ is intended to reduce its generalization error but not its training error" \cite
 In theory, regularization is used to reduce the amount of variance in a model, at the cost of increasing the model's
  bias. This is often referred to as the \emph{bias-variance tradeoff}. While the bias is a measures for the inherent inability of
  a model to capture the true relationship of the data, variance measures the variability of predictions across different 
-sets of data. Thus reducing the variance of a model, results in a better generalization ability on unseen data.\cite{IBMRegularization}
-\marginpar{\cite{Goodfellow-et-al-2016}}
+sets of data. Thus reducing the variance of a model, results in a better generalization ability on unseen data\cite{IBMRegularization}.
+\marginpar{As described in \cite{Goodfellow-et-al-2016}}
 There are various techniques to facilitate regularization, one of 
 the most widely used regularization techniques is the norm penalty on the model's parameters. This introduces a penalty
 \(\Omega(\theta)\), where \(\Omega\) is a norm and \(\theta\) represents the network's parameters.
@@ -1030,10 +1027,10 @@ the model's performance on the validation step stops improving (or starts worsen
 on the training set continues to improve. Although simple, this form of regularization has been proven to be very effective.
 \cite{Goodfellow-et-al-2016}
 
-\subsection{Decoupled Weight Decay}
+\subsection{Decoupled Weight Decay \cite{Loshchilov2017FixingWD}}
 \label{sec:dcp_weightdecay}
 
-\emph{Decoupled Weight Decay} \cite{Loshchilov2017FixingWD} introduces a novel approach that reorders the application of the network parameters $\theta$ within the optimizer.
+\emph{Decoupled Weight Decay}  introduces a novel approach that reorders the application of the network parameters $\theta$ within the optimizer.
 The authors find that the traditional implementation of weight decay, which is the addition of $\lambda \theta$ to the gradient in the optimizer \cite{Loshchilov2017FixingWD},
 is effectively equivalent to $L_2$ regularization
 for standard stochastic gradient descent (SGD). Given our \emph{L2} regularized loss $\tilde{J}(\theta; X, y)$,
