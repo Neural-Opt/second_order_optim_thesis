@@ -24,7 +24,7 @@ have provably better convergence properties than first-order methods.
 Techniques such as Newton's method utilize the Hessian for rapid convergence.\\
 Algorithms in this family often use a preconditioning matrix to transform the gradient before applying each step.
 Classically, the preconditioner is the matrix of second-order derivatives (the Hessian) in the context of
-exact deterministic optimization.\cite{anil2021scalable}\\
+exact deterministic optimization\cite{anil2021scalable}.\\
 In machine learning, the direct application of second-order information is unfortunately limited due to the computational 
 intensity and storage requirements of handling full Hessian matrices,
 particularly since today's models often involve billions of trainable parameters.
@@ -33,7 +33,7 @@ because of their simplicity and reduced computational demands,
 they often fall short in convergence speed and sensitivity to hyperparameter settings.\\ 
 Recent practice of training large models even suggests
 that the utility of common first-order methods is quickly reaching a plateau, as their time-per-step is already negligible.
-Consequently, the only way to accelerate training is by reducing the number of steps taken by the optimizers to reach a solution.\cite{anil2021scalable}\\
+Consequently, the only way to accelerate training is by reducing the number of steps taken by the optimizers to reach a solution\cite{anil2021scalable}.\\
 Therefore integrating Hessian-based information can potentially improve optimization efficiency by drastically increasing training convergence.
 In this thesis, we will focus on two novel approaches for neural network optimization: \emph{AdaHessian} \cite{yao2021adahessian} and \emph{Apollo},
 as they are optimizers that incorporate second-order information by estimating diagonal Hessian elements to adjust learning rates.

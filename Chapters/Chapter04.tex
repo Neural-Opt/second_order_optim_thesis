@@ -1,2 +1,21 @@
 
 \chapter{Conclusion and Future Directions}
+In this work, we examined \emph{Apollo} and \emph{AdaHessian}, two recent advancements in the field of second-order optimization for neural network training.
+We evaluated both optimizers in terms of performance on common datasets and resource consumption,
+compared to first-order methods. While \emph{AdaHessian} demonstrated strong performance in approximating the batch Hessian diagonal,
+its significant resource requirements and the need for gradient graph creation in PyTorch make it impractical for non-academic use. 
+On the other hand, \emph{Apollo}, though able to perform similarly to \emph{AdaHessian} in our experiments,
+exhibited a significant limitation in its Hessian approximation due to its clamping operation,
+which loses curvature information when values fall below $\sigma$.
+Furthermore, we identified several implementation flaws in \emph{Apollo}, which we addressed in our modified version,
+\emph{SApollo}.
+In addition to fixing these issues, \emph{SApollo} introduces a smoothed version of the Hessian approximation,
+$B$, to reduce the influence of stochastic noise. Instead of clamping values below $\sigma$, \emph{SApollo} adds $\sigma$ to approximations
+that fall below this threshold, ensuring that small approximation information is retained.
+This approach led to improved Hessian approximation accuracy and better convergence performance on the \emph{CIFAR-10} dataset.
+We hypothesize that using smaller values for $\sigma$, in the range of $[10^{-3}, 10^{-4}, 10^{-5}]$,
+could lead to significantly better performance.
+The value $\sigma = 0.01$, which Apollo uses, is relatively large when compared to the typical magnitude of gradients,
+which are often much smaller, especially when training deep networks like \emph{ResNet}.
+By introducing $\sigma$ as a tunable hyperparameter in \emph{SApollo}, fine-tuning it could be an interesting direction for future research.
+

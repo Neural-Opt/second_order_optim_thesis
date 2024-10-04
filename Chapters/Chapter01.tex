@@ -77,7 +77,7 @@ outputs a scalar \( f(\mathbf{x}) \in \mathbb{R} \). Then the Hessian matrix \( 
 \end{align}
 \emph{Schwarz's Theorem} states states the following: Let \( U \subseteq \mathbb{R}^n \) be an open set and \( f \colon U \to \mathbb{R} \) be at least \( k \)-times partially differentiable.
 If all \( k \)-th partial derivatives in \( U \) are at least continuous, then \( f \) is \( k \)-times totally differentiable.
-In particular, the order of differentiation in all \( l \)-th partial derivatives with \( l \leq k \) is irrelevant. \cite{arens2011mathematik} \\
+In particular, the order of differentiation in all \( l \)-th partial derivatives with \( l \leq k \) is irrelevant\cite{arens2011mathematik}.  \\
 We can therefore conclude that \( \mathbf{H} \) is in fact a symmetric real-valued $n\times n$ matrix, meaning \( \mathbf{H} = \mathbf{H}^T \).\\
 \subsubsection{Eigenvalues of the Hessian}
 Because \( \mathbf{H} \) is symmetric, there exist $n$ lineraly independent eigenvectors,
@@ -123,7 +123,7 @@ The condition number of a matrix $M$, is defined as
     \kappa(M) = \frac{\sigma_{\max}(M)}{\sigma_{\min}(M)},
     \end{align}
 where $\sigma_{\max}$ and $\sigma_{\min}$ are the largest and smallest singular values (square roots of non-negative eigenvalues \cite{SZABO2015320}) of $M$ respectively.
-$M$ is called \emph{ill-conditioned} if $\kappa(M) \gg 1$.
+$M$ is called \emph{ill-conditioned} if $\kappa(M) \gg 1$
 \cite{strang2022introduction}.
 \section{Introduction to Optimization}
 \label{sec:optimization}
@@ -135,13 +135,13 @@ These objectives depend on system characteristics known as variables or paramete
 The goal of optimization is to identify the values of the set of variables or parameters that minimize or maximize a given objective.
 The parameters often face some constraints, that are necessary to arrive at a practical solution.
 Examples for this might be the non-negativity of the interest rate on a loan or the electron
-density in a molecule.\cite{nocedal2006numerical}
+density in a molecule\cite{nocedal2006numerical}.
 The process of building such an objective-(function), choosing its parameters and constraints is called \emph{modelling}.
 Constructing an effective model is often the most important step in solving a given problem.
 If the model is too simple, it might not capture the core of the problem.
 On the other hand, if it's overly complex, it may lead to difficult-to-compute solutions and become prone to issues like \emph{overfitting},
 which will be covered in later sections. \\\\
-\marginpar{\cite{nocedal2006numerical}}
+\marginpar{As defined in \cite{nocedal2006numerical}}
 Mathematically, a model and its constraints may be defined as follows
 \[
 \min_{\mathbf{x} \in \mathbb{R}^{n}} f(\mathbf{x}) \quad \text{subject to} \quad
@@ -157,7 +157,7 @@ Once the model has been formulated, an optimization algorithm can be used to
 find its solution, usually with the help of a computer~\cite{nocedal2006numerical}. 
 The choice of an optimization algorithm heavily relies on the model's characteristics.
 Factors like linearity, differentiability, convexity, and dimensionality influence whether methods like simplex (for linear models)
-or gradient descent (for differentiable non-linear models) are suitable.\cite{sun2019survey}.\\
+or gradient descent (for differentiable non-linear models) are suitable\cite{sun2019survey}.\\
 In this work, we focus on \emph{unconstrained nonlinear } optimization problems, which involve finding the optimal values of a nonlinear objective function 
 without explicit constraints on the variables.
 These types of problems are the most frequently encountered in modern machine learning models, particularly in the realm of deep learning \cite{Goodfellow-et-al-2016}.
@@ -195,10 +195,9 @@ An incorrect choice of $\gamma$ can yield significantly different outcomes: if t
 if too small, progress will be slow, requiring many iterations to reach convergence. \cite{wu2020wngrad} 
 
 
-\subsection{Empirical Risk Minimization (ERM)}
+\subsection{Empirical Risk Minimization (ERM) \cite{bottou2018optimization}}
 \label{sec:erm}
 
-\marginpar{\cite{bottou2018optimization}}
 In machine learning, optimization problems naturally arise due to the formulation of prediction models and the associated loss functions.
 These are typically used to evaluate measures like the \emph{expected} and \emph{empirical risk}, which practitioners aim to minimize \cite{bottou2018optimization}.
 To formalize this, let's define a family of model functions for some given \( f(\cdot; \cdot) : \mathbb{R}^{d_x} \times \mathbb{R}^d \to \mathbb{R}^{d_y} \) as follows:
@@ -206,7 +205,6 @@ To formalize this, let's define a family of model functions for some given \( f(
 \mathbb{F} := \{ f(\cdot; \theta) : \theta \in \mathbb{R}^d \}.
 \end{align}
 
-\marginpar{\cite{bottou2018optimization}}
 The set \(\mathbb{F}\) represents a collection of functions parameterized by a parameter vector \( w \) that determine the prediction functions in use.
 Now assume a loss function \( l : \mathbb{R}^{d_y} \times \mathbb{R}^{d_y} \to \mathbb{R} \), which, given an input-output pair \((x, y)\) and a model $f \in \mathbb{F}$, yields the loss \( l(f(x; w), y) \).
 The most gratifying behavior for such a prediction function is to minimize the expected loss between any input-output pair.
@@ -215,7 +213,7 @@ then we could write the \emph{expected risk} as
 \begin{align}
 R(\theta) = \int_{\mathbb{R}^{d_x} \times \mathbb{R}^{d_y}} l(f(x; \theta), y) dP(x, y) = \mathbb{E}[l(f(x; \theta), y)].
 \end{align}
-\marginpar{\cite{bottou2018optimization}}
+
 Minimization of $R(\theta)$ would ensure that the expected loss for the resulting model $f(\cdot; w) $ over all possible $(x, y)$ is minimal.\\
 In practice, however, this is unfeasible when one lacks complete information about $P$.
 Instead, one seeks to solve a problem by estimating \( R \).
@@ -233,10 +231,9 @@ In standard gradient descent, it is actually this \emph{empirical risk} function
 \end{align}
 
 The gradient descent algorithm continues to iterate through this update step until a convergence criterion is met, such as a maximum number of iterations or an acceptable error tolerance.
-\subsection{Stochastic Gradient Descent}
+\subsection{Stochastic Gradient Descent \cite{stanfordSGD}}
 \label{sec:sgd}
 
-\marginpar{\cite{stanfordSGD}}
 
 Since standard gradient descent requires the evaluation of the gradient over the whole set of training data, large training sets can quickly become 
 computationally expensive.
@@ -251,16 +248,14 @@ Another issue with standard gradient descent optimization methods is that they d
  \begin{align}
     \theta_{t+1} = \theta_t - \gamma  {\nabla} R_b(\theta).
 \end{align}
-\marginpar{\cite{garrigos2024handbook}}
-It can be shown that, this estimate $\nabla R_b(\theta)$ provides an unbiased estimator of the true gradient, satisfying
+It can be shown that, this estimate $\nabla R_b(\theta)$ provides an unbiased estimator of the true gradient \cite{garrigos2024handbook}, satisfying
 \begin{align}
-\mathbb{E}[{\nabla} R_b(\theta)] = \nabla R_n(\theta).
+\mathbb{E}[{\nabla} R_b(\theta)] = \nabla R_n(\theta) .
 \end{align}
 While this introduces noise into the gradient estimates, repeated updates over many mini-batches allow SGD to approximate the true gradient descent path.
-\subsection{Momentum}
+\subsection{Momentum \cite{Goodfellow-et-al-2016}}
 \label{sec:momentum}
 
-\marginpar{\cite{Goodfellow-et-al-2016}}
 
 While Stochastic Gradient Descent (SGD) is a very effective algorithm for optimization,
 its convergence rates can often be slow. To tackle the problem of slow convergence,
@@ -278,17 +273,15 @@ where
     \item $\beta \in [0, 1) $ is the momentum term, typically set between 0.9 and 0.99,
     \item $\nabla_{\theta} J(\theta_t)$ is the gradient of the loss function at iteration $t$.
 \end{itemize}
-\marginpar{\cite{Goodfellow-et-al-2016}}
 The hyperparameter $\beta$ determines how quickly the contributions of previous gradients
 exponentially decay. Therefore, the larger $\beta$ is, the more previous gradients affect
 the next update direction. With this exponentially weighted summation, we can avoid the gradient successively changing sign
 and jumping around, because the moving average smooths out the updates by considering the influence of past gradients.
 This results in a more stable and consistent direction of the gradient descent~\cite{Goodfellow-et-al-2016}.
 
-\subsection{RMSProp}
+\subsection{RMSProp \cite{Goodfellow-et-al-2016}}
 \label{sec:rmsprop}
 
-\marginpar{\cite{Goodfellow-et-al-2016}}
 RMSProp (\emph{Root Mean Square Propagation}) \cite{hintonrms} is an adaptive learning rate optimization algorithm that adjusts the learning rate
 for each parameter based on the magnitude of recent gradients.
 It works by maintaining an exponential moving average of the past squared gradients to obtain curvature information. The scalar learning rate
@@ -309,12 +302,10 @@ where
     \item $\epsilon$ is a small constant (e.g., $10^{-8}$) to prevent division by zero.
 \end{itemize}
 
-\subsection{Adam}
+\subsection{Adam \cite{kingma2017adam}}
 \label{sec:adam}
 
-\marginpar{\cite{d2l2023adam}}
-
-Adam (\emph{Adaptive Momentum})~\cite{kingma2017adam} is one of the most well known and popular
+Adam (\emph{Adaptive Momentum}) is one of the most well known and popular
 optimization algorithms for neural networks today. It builds upon the ideas of Momentum and
 adaptive scaling of the learning rate, as it combines both the ideas of Momentum and RMSProp.
 Adam calculates an exponential moving average not only from the gradients, but also the squared gradients.
@@ -345,15 +336,14 @@ uses a first-order moment estimate ($m_t$) in addition to the second-order momen
 stability of the training process.
 Adam initializes $m_0 = 0$ and $v_0 = 0$. Consequently, $m_t$ and $v_t$ are biased towards
 zero, especially when the decay rates $\beta_1$ and $\beta_2$ are close to 1 \cite{d2l2023adam}. This bias
-can lead to very large step sizes in the early stages of training.\cite{Goodfellow-et-al-2016} To counteract this,
+can lead to very large step sizes in the early stages of training \cite{Goodfellow-et-al-2016}. To counteract this,
 Adam applies bias correction by dividing $m_t$ and $v_t$ by $(1 - \beta_1^t)$ and
 $(1 - \beta_2^t)$, respectively, ensuring that the gradients at earlier steps are
 accurately represented \cite{d2l2023adam}.
 
-\subsection{AdaBelief}
+\subsection{AdaBelief \cite{zhuang2020adabeliefoptimizeradaptingstepsizes}}
 \label{sec:adabelief}
 
-\marginpar{\cite{zhuang2020adabeliefoptimizeradaptingstepsizes}}
 
 AdaBelief \cite{zhuang2020adabeliefoptimizeradaptingstepsizes} is a novel optimizer that builds
 upon the Adam algorithm. The core concept of AdaBelief is to adapt the step size based on the
@@ -413,7 +403,7 @@ that
 \begin{equation}
     f(x+\Delta x ) = f(x) + \nabla f(x)^T\Delta x  + \frac{1}{2}\Delta x ^T\nabla^2f(x)\Delta x 
 \end{equation}
-This follows from the second-order Taylor expansion with $x \in \mathbb{R}^n$ choosen as the expansion point. \cite{nocedal2006numerical}\\
+This follows from the second-order Taylor expansion with $x \in \mathbb{R}^n$ choosen as the expansion point \cite{nocedal2006numerical}.\\
 As previously mentioned, this function approximates a paraboloid. To find the minimizer of this approximation we differentiate with respect to $\Delta x $ and set the gradient to zero.
 \begin{align}
     \begin{array}{rcl}
@@ -447,9 +437,8 @@ There are several factors that contribute to this behavior, which can be categor
    
 \end{itemize}
 
-\subsubsection{Proof of Convergence}
+\subsubsection{Proof of Convergence \cite{yao2021adahessian}}
 \label{sec:newton_conv}
-\marginpar{\cite{yao2021adahessian}}
 
 We conclude this section on the Newton method by a proof of its convergence in a strongly convex and strictly smooth setting.
 This proof serves as a reference for our subsequent discussion, where we argue that using only the diagonal of the Hessian inverse also yields
@@ -473,35 +462,37 @@ where $I$ is the identity matrix, $\alpha$ is the strong convexity parameter
 (satisfying $\exists \alpha > 0 : \alpha I \preceq \nabla^2 f(\theta), \quad \forall \theta \in \mathbb{R}^d$) \cite{convexity_smoothness},
 and $\beta$ is the strict smoothness parameter (satisfying $\exists \beta > 0 : \nabla^2 f(\theta) \preceq \beta I, \quad \forall \theta \in \mathbb{R}^d$) \cite{convexity_smoothness}.
 While $\preceq$ denotes the positive semidefinite ordering of matrices (see \ref{sec:matrix_definiteness}).\\
-Now define $\lambda\theta_t = \left( g_t^T \mathbf{H}_t^{-1} g_t \right)^{1/2}$ and $
+Now define a function $\lambda(\theta_t) = \left( g_t^T \mathbf{H}_t^{-1} g_t \right)^{1/2}$ and $
 \Delta \theta = \mathbf{H}^{-1}g_t$.
 Given the $\beta$-smoothness property of $f$, we can infer that 
 \begin{align}
     \begin{split}
         f(\theta_t - \eta\Delta \theta_t) &\leq f(\theta_t) + g_t^T ((\theta_t - \eta\Delta \theta_t) - \theta_t) \\
-        &\quad + \frac{\beta}{2} \Vert (\theta_t - \eta\Delta \theta_t) - \theta_t \Vert ^2\\
-        &= f(\theta_t) - \eta g_t^T \Delta \theta_t + \frac{\eta^2\beta}{2} \Vert \Delta \theta_t \Vert ^2.
+        &\quad + \frac{\beta}{2} \Vert (\theta_t - \eta\Delta \theta_t) - \theta_t \Vert_2 ^2\\
+        &= f(\theta_t) - \eta g_t^T \Delta \theta_t + \frac{\eta^2\beta}{2} \Vert \Delta \theta_t \Vert_2 ^2.
     \end{split}
 \end{align}
-Now $(\lambda \theta_t)^2 = g_t^T \mathbf{H}_t^{-1} g_t  = \Delta \theta_t^T \mathbf{H}_t \Delta \theta_t$, and $g_t^T \Delta \theta_t =(\lambda\theta_t)^2 $. \\
+
+Now $\lambda (\theta_t)^2 = g_t^T \mathbf{H}_t^{-1} g_t  = \Delta \theta_t^T \mathbf{H}_t \Delta \theta_t$, as $\mathbf{H}_t$ is symmetric, and $g_t^T \Delta \theta_t =\lambda(\theta_t)^2 $. \\
 Because of the strong convexity of $f$ (see \ref{eq:convex_smooth}) we get
 \begin{align}
     \label{eq:inequality}
     \Delta \theta_t^T (\mathbf{H}_t - \alpha I) \Delta \theta_t &\geq 0 
     \Longleftrightarrow \Delta \theta_t^T \mathbf{H}_t \Delta \theta_t   \geq \alpha \|\Delta \theta_t\|^2,
 \end{align}
-thus $  \Vert \Delta \theta_t \Vert ^2 \leq  \frac{1}{\alpha} \Delta \theta_t^T \mathbf{H}_t \Delta \theta_t = \frac{1}{\alpha} (\lambda \theta_t)^2 $.
+thus $  \Vert \Delta \theta_t \Vert ^2 \leq  \frac{1}{\alpha} \Delta \theta_t^T \mathbf{H}_t \Delta \theta_t = \frac{1}{\alpha} \lambda (\theta_t)^2 $.
 Now putting everything together
 \begin{equation}
-    f(\theta_t - \eta\Delta \theta_t) \leq f(\theta_t) - \eta (\lambda \theta_t)^2 + \frac{\eta^2\beta}{2\alpha} (\lambda \theta_t)^2.
+    f(\theta_t - \eta\Delta \theta_t) \leq f(\theta_t) - \eta \lambda (\theta_t)^2 + \frac{\eta^2\beta}{2\alpha} \lambda (\theta_t)^2.
 \end{equation}
+
 Setting the stepsize $\eta = \frac{a}{\beta}$ and expanding, it follows
 \begin{equation}
-    f(\theta_t - \eta\Delta \theta_t) \leq f(\theta_t) - \frac{1}{2} \eta (\lambda \theta_t)^2 .
+    f(\theta_t - \eta\Delta \theta_t) \leq f(\theta_t) - \frac{1}{2} \eta \lambda (\theta_t)^2 .
 \end{equation}
-We follow \ref{eq:inequality} and since $\frac{1}{\beta}I \preceq (\nabla^2 f(\theta))^{-1}  $, we get
+We follow \ref{eq:inequality} and since $\frac{1}{\beta}I \preceq \mathbf{H}_t^{-1}  $, we get
 \begin{equation}
-    (\lambda \theta_t)^2 = g_t^T \mathbf{H}_t^{-1} g_t \geq \frac{1}{\beta} \Vert g_t \Vert ^2,
+    \lambda (\theta_t)^2 = g_t^T \mathbf{H}_t^{-1} g_t \geq \frac{1}{\beta} \Vert g_t \Vert ^2,
 \end{equation}
 with which we finally arrive at the claim
 \begin{equation}
@@ -509,8 +500,7 @@ with which we finally arrive at the claim
      \hfill \fbox{\phantom{\rule{.2ex}{.2ex}}}
 \end{equation}
 
-\subsection{DFP \& BFGS}
-\marginpar{\cite{nocedal2006numerical}}
+\subsection{DFP \& BFGS \cite{nocedal2006numerical}}
 \label{sec:bfgs}
 Now that we know why the Hessian is a very useful quantity for optimization, we will take a look at how we can approximate it,
 as exact calculation is infeasible for most large-scale problems.
@@ -583,9 +573,9 @@ In practice, however, due to the computational burden, line search is often avoi
 Instead, the step size is often fixed and chosen as a hyperparameter, at the expense of losing the guaranteed decrease provided by line search \cite{linesearch}.
 }
 
-\subsection{AdaHessian}
+\subsection{AdaHessian  \cite{yao2021adahessian}}
 \label{sec:adahessian}
-\emph{AdaHessian}, introduced in 2020 by Yao et al. \cite{yao2021adahessian}, is an adaptive second-order optimization algorithm.
+\emph{AdaHessian}, is an adaptive second-order optimization algorithm.
 While being conceptually very similar to \emph{Adam} (\ref{sec:adam}), \emph{AdaHessian} replaces the square of the gradients
 in \emph{Adam's} second moment with the square of a Hessian diagonal approximation.
 To estimate the Hessian diagonal, AdaHessian employs two key techniques.
@@ -611,8 +601,7 @@ Note that the authors of \cite{yao2021adahessian} found that a single sampling o
 Next up, we demonstrate that employing this diagonal approximation of the Hessian in the update step yields convergence properties equivalent to those achieved
 when utilizing the full Hessian matrix.
 \\\\
-\marginpar{\cite{yao2021adahessian}}
-\noindent\textbf{Theorem (Convergence Rate of Hessian Diagonal Method)} \\
+\noindent\textbf{Theorem (Convergence Rate of Hessian Diagonal Method) \cite{yao2021adahessian}} \\
 \textit{Let $f: \mathbb{R}^d \to \mathbb{R}$ be a twice continuously differentiable, strongly convex and strictly smooth function. Then, the update rule given by
     \[ \theta_{t+1} = \theta_t - \eta D_t^{-1} g_t, \]
     where $D_t$ is the diagonal of the Hessian $H_t = \nabla^2 f(\theta_t)$ and $g_t = \nabla f(\theta_t)$, yields a converging algorithm with the following guarantee

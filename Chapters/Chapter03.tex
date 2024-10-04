@@ -169,8 +169,12 @@ which deviate from its theoretical formulation. In line \textbf{5}, we see the i
 However, \texttt{delta\_grad} is not the true difference between the current and previous gradient,
 but rather the difference between the current gradient and \texttt{exp\_avg\_grad}, where \texttt{exp\_avg\_grad}
 is not the EMA of the gradient, but a recursive form of $\texttt{exp\_avg\_grad}_{t+1} = (1-\beta) (\texttt{grad} - \texttt{exp\_avg\_grad}_{t})$ (see line \textbf{9}).
-In addition, this value is used as a replacement for the EMA of the gradient in line \textbf{19}, when preconditioning it with the Hessian diagonal approximation.
-We suspect that the authors overlooked this, as the variable is named \texttt{exp\_avg\_grad}, which is typically the name used for the EMA of the gradient in first-order implementations.
+Additionally, this value is used as a replacement for the EMA of the gradient in line \textbf{19},
+where it is preconditioned using the Hessian diagonal approximation.
+Furthermore, the bias correction in line \textbf{9} does not follow the standard approach for updating an EMA (see Section \ref{sec:adam}).
+We suspect that the authors may have incorrectly updated \texttt{exp\_avg\_grad} with \texttt{delta\_grad} instead of \texttt{grad},
+as doing so would align with the theoretical formulation, aside from the incorrect bias correction.
+
 \begin{figure}[H]
 \begin{minted}[linenos,frame=lines, framesep=2mm]{python}
 (...)
@@ -203,7 +207,9 @@ p.add_(d_p, alpha=-curr_lr)
     Figure \ref{fig:sapollo_imp} illustrates our implementation. We calculate \texttt{exp\_avg\_grad} as a properly implemented EMA of the gradient and use it in the preconditioning step.
     Furthermore, we calculate \texttt{delta\_grad}, by capturing the difference between the current and previous gradient values.
     The Hessian diagonal approximation $B$ is implemented as a moving average of the updates derived from Eq. \ref{eq:apollo-update}.
-    As we identified the clamping operation to be problematic for small values, we instead add $\sigma$ to the absolute values of $B$ (line \textbf{21}).
+    As we identified the clamping operation to be problematic for small values, we instead add $\sigma$ to the absolute values of $B$ (line \textbf{21}) if they are smaller than $\sigma$.
+    Although this can lead to a learning rate decrease of at most twice the amount of \emph{Apollo}, it is able to capture
+    important curvature information. To tune $\sigma$ in practice, \emph{SApollo} introduces $\sigma$ as a hyperparameter.
     Since \emph{Apollo} does not implement $\sigma$ as a hyperparameter, for a fair comparison, we use the same hyperparameters and  value for $\sigma$ (0.01) in \emph{SApollo}, even though smaller values might lead to a more accurate Hessian approximation.
     Figure \ref{fig:sapollo-approx-weights} shows the results of the Hessian approximation. 
     While \emph{SApollo} is not yet competitive with first-order methods, it is on par or performs better than \emph{Apollo} especially in later layers.
@@ -254,7 +260,7 @@ p.add_(d_p, alpha=-curr_lr)
             \end{tabular}
             \caption{The cosine similarity (in degrees), y-axis, between the calculated batch Hessian diagonal and the corresponding optimizer approximations on a \emph{small} batch (124 samples).
             Optimizer updates are denoted on the x-axis.
-            Note that these results represent only the Hessian diagonals for the network's \emph{weights}. For the corresponding analysis on biases, please refer to Figure \ref{fig:cosine-bias-small-batch}.
+            Note that these results represent only the Hessian diagonals for the network's \emph{weights}. For the corresponding analysis on biases, please refer to Figure \ref{fig:sappolo-cosine-bias-small-batch}.
         }
             \label{fig:sapollo-approx-weights}
         \end{figure}
@@ -265,6 +271,6 @@ p.add_(d_p, alpha=-curr_lr)
                 \input{assets/chap3/sapollo-perf.tex} \\ % Replace with the correct path to your .tex file
             \end{tabular}
             \caption{
-           .
+               Evaluation of \emph{SApollo} on CIFAR-10 using ResNet-110 with the \emph{cosine annealing} learning rate scheduler. For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$. 
         }
         \end{figure}

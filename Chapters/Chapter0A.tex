@@ -46,7 +46,16 @@
     Note that these results represent only the Hessian diagonals for the network's \emph{biases}.}
     \label{fig:cosine-bias-big-batch}
 \end{figure}
-
+\begin{figure}[h!]
+    \centering
+    \begin{tabular}{cc}
+        \input{assets/chap3/sapollo-approx-bias.tex} \\ % Replace with the correct path to your .tex file
+    \end{tabular}
+    \caption{The cosine similarity (in degrees), y-axis, between the calculated batch Hessian diagonal and the corresponding optimizer approximations on a \emph{small} batch (124 samples).
+    Optimizer updates are denoted on the x-axis.
+    Note that these results represent only the Hessian diagonals for the network's \emph{biases}.}
+    \label{fig:sappolo-cosine-bias-small-batch}
+\end{figure}
 \begin{table}[h!]
     \centering
     \caption{Hyperparameter settings for CIFAR-10. Values in parentheses indicate configurations used for individual best-case evaluations. }

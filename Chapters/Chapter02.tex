@@ -89,8 +89,7 @@ datasets, as well as the chosen hyperparameters for the optimizers and learning 
         \input{assets/chap2/cifar10/step-lr-second-order-best.tex} \\ % Replace with the correct path to your .tex file
     \end{tabular}
     \caption{Evaluation of optimizers on CIFAR-10 using ResNet-110 with the \emph{milestone} learning rate scheduler, where hyperparameters
-    are choosen optimally across all optimizers.
-    For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$.
+    are choosen optimally across all optimizers.For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$.
     }
     \label{fig:cifar-10-milestone-second-best}
 \end{figure}
@@ -169,7 +168,7 @@ While \emph{AdaHessian}, \emph{Apollo} and \emph{ApolloW} perform similiar in th
 \ref{fig:cifar-10-cosine-real}. This observation lends credence to the claim in \cite{apollo} that \emph{Apollo} and \emph{ApolloW} 
 may be more practical than \emph{AdaHessian} for real-world applications.\\
 Expanding on \emph{Apollo's} better generalization abilities, figure \ref{fig:cifar-10-cosine-second} shows that \emph{Apollo} and \emph{ApolloW} continue to decrease their
-test loss even at epoch 164, while \emph{Adam} and \emph{AdamW}, which share the same weight decay,
+test loss even at epoch 164, while \emph{Adam} and \emph{AdamW},
 experience a steadily increasing test loss.
 
 In Table \ref{tab:optimizer_comparison_perf}, we can observe the maximum memory consumption
@@ -269,7 +268,7 @@ applicability not only by its variability in performance, but also by its memory
         \input{assets/chap2/tinyimagenet/step-lr-second-order-best.tex} \\ 
     \end{tabular}
     \caption{Evaluation of optimizers on TinyImageNet using ResNet-18 with the \emph{milestone} learning rate scheduler, where hyperparameters
-    where hyperparameters are choosen optimally across all optimizers. For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$.}
+    where hyperparameters are choosen optimally across all optimizers. }
     \label{fig:tinyimagenet-perf-cosine}
 \end{figure}
 \begin{figure}[h!]
@@ -278,7 +277,7 @@ applicability not only by its variability in performance, but also by its memory
         \input{assets/chap2/tinyimagenet/cosine-second-order-best.tex } \\ 
     \end{tabular}
     \caption{Evaluation of optimizers on TinyImageNet using ResNet-18 with the \emph{cosine} learning rate scheduler, where hyperparameters
-    where hyperparameters are choosen optimally across all optimizers. For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$.}
+    where hyperparameters are choosen optimally across all optimizers.}
     \label{fig:tinyimagenet-perf-opt}
 \end{figure}
 
