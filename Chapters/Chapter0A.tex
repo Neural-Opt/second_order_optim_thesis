@@ -30,7 +30,7 @@
     \begin{tabular}{cc}
         \input{assets/chap3/bias-sim-small.tex} \\ % Replace with the correct path to your .tex file
     \end{tabular}
-    \caption{The cosine similarity (in degrees), y-axis, between the calculated batch Hessian diagonal and the corresponding optimizer approximations on a \emph{small} batch (128 samples).
+    \caption{The cosine similarity (in degrees), y-axis, between the calculated batch Hessian diagonal and the corresponding optimizer approximations on a \emph{small} batch (124 samples).
     Optimizer updates are denoted on the x-axis.
     Note that these results represent only the Hessian diagonals for the network's \emph{biases}.}
     \label{fig:cosine-bias-small-batch}
@@ -41,7 +41,7 @@
     \begin{tabular}{cc}
         \input{assets/chap3/bias-sim-big.tex} \\ % Replace with the correct path to your .tex file
     \end{tabular}
-    \caption{The cosine similarity (in degrees), y-axis, between the calculated batch Hessian diagonal and the corresponding optimizer approximations on a \emph{small} batch (128 samples).
+    \caption{The cosine similarity (in degrees), y-axis, between the calculated batch Hessian diagonal and the corresponding optimizer approximations on a \emph{small} batch (124 samples).
     Optimizer updates are denoted on the x-axis.
     Note that these results represent only the Hessian diagonals for the network's \emph{biases}.}
     \label{fig:cosine-bias-big-batch}
@@ -109,7 +109,7 @@
 
 \begin{table}[h!]
     \centering
-    \caption{Hyperparameter settings for curvature approximation quality.}
+    \caption{Hyperparameter settings for curvature approximation quality. Values in parentheses are used in the \emph{SApollo} comparison}
     \label{tab:curve-approx-params}
     \begin{tabular}{lcccccc}  % Adjust the number of 'c's depending on the number of columns
         \toprule
@@ -117,7 +117,9 @@
         \midrule
         Adam        & $1 \times 10^{-2}$ & 0  & (0.9,0.999) & $1 \times 10^{-08}$   \\
         AdaBelief   & $1 \times 10^{-2}$ & 0   & (0.9,0.999) & $1 \times 10^{-08}$   \\
-        Apollo      & $3 \times 10^{-3}$  & 0  & (0.9)  & $1 \times 10 ^{-4} $  \\
+        Apollo      & $3 \times 10^{-3}$ (0.01)  & 0  & (0.9)  & $1 \times 10 ^{-4} $  \\
+        SApollo      & 0.01 & 0  & (0.9)  & $1 \times 10 ^{-4} $  \\
+
         AdaHessian  & $2 \times 10^{-1}$ & 0  & (0.9,0.999) &   $1 \times 10 ^{-4} $ \\
         \bottomrule
     \end{tabular}

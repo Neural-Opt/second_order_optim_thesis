@@ -44,6 +44,15 @@ Additionally, we aim to make the following contributions:
     \item Investigating whether the claimed advantage of these optimizers in providing a better approximation of the Hessian diagonal holds up when compared to simpler approximations made by first-order methods.
     \item If the claim in 2 does not hold, investigate the reasons behind the optimizer's failure and propose a solution.
 \end{enumerate}
+We begin by providing a general overview of the theoretical foundations of optimization and neural network training in Chapter 1.
+This includes a detailed explanation of well-known first-order optimizers, as well as Newton's Method, and the motivation behind \emph{Apollo} and \emph{AdaHessian}.
+The chapter concludes with an overview of the neural network training process, along with manual methods for calculating the Hessian matrix using forward and backward propagation.
+In Chapter 2, we evaluate each optimizer on multiple datasets, including tasks in both vision and translation.
+Additionally, we measure the resource footprint of each optimizer to assess their real-world applicability.
+In Chapter 3, we assess the quality of the Hessian approximation for both second-order and selected first-order optimizers using
+a small convolutional neural network.
+We conclude our work by introducing the \emph{SApollo} optimizer, which aims to address issues related to the implementation of \emph{Apollo}.
+
 
 \vfill
 

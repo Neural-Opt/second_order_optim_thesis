@@ -114,7 +114,7 @@ were $ A,B \in \mathbb{R}^{n \times n}$ are symmetric matrices.
 %Since $ \mathbf{x}^T \mathbf{x} = \| \mathbf{x} \|^2 > 0 $, the $ \lambda $s determine the sign \cite{strang2022introduction}.
 \subsubsection{Singular Matrix }
 
-Let $ \mathbf{M}$  be an $n \times n$ symmetric matrix with  $n \in \mathbb{R}$, then $ \mathbf{M}$ is called \emph{singular} if and only if it's determinant is $0$. Therefore $\mathbf{M}^{-1}$ does not exist, meaning $ \mathbf{M}$ does not have an inverse.\\\\  
+Let $ \mathbf{M}$  be an $n \times n$ symmetric matrix with  $n \in \mathbb{R}$, then $ \mathbf{M}$ is called \emph{singular} if and only if it's determinant is $0$. Therefore $\mathbf{M}^{-1}$ does not exist, meaning $ \mathbf{M}$ does not have an inverse.\\ 
 \subsubsection{Ill-conditioned Matrices}
 A matrix $\mathbf{M} \in \mathcal{R}^{n\times m}$ is called \emph{ill-conditioned} when its \emph{condition number} is high.
 This implies that small changes in its input (or elements) result in disproportionately large changes in its output.
@@ -591,7 +591,7 @@ in \emph{Adam's} second moment with the square of a Hessian diagonal approximati
 To estimate the Hessian diagonal, AdaHessian employs two key techniques.
 First, it utilizes a Hessian-free method based on the Hessian-vector product \cite{pearlmutter1994fast}.
 This approach allows for efficient computation without explicitly forming the full Hessian matrix.
-Second, AdaHessian implements a stochastic Hessian diagonal approximation based on \cite{martens2015optimizing},
+Second, AdaHessian implements a stochastic Hessian diagonal approximation based on \cite{BEKAS20071214},
 which leverages the Hutchinson method \cite{hutchinson}, a technique for trace estimation of matrices.
 Now let $f$ with $f: \mathbb{R}^n \to \mathbb{R}$ and $x \in \mathbb{R}^n$, be a neural network with subsequent
 loss calculation. We start by taking the scalar product of $g=\nabla_\theta f$ with $z$, where
@@ -601,7 +601,7 @@ We then calculate the derivative of this scalar with respect to $\theta$, such t
  \frac{\partial g^T z}{\partial \theta} = \frac{\partial g^T}{\partial \theta} z + g^T \frac{\partial z}{\partial \theta} = \frac{\partial g^T}{\partial \theta} z = Hz.
 \end{equation}
 This method is known as a Hessian-free approach,because by calculating this derivative, we obtain a Hessian-vector product without explicitly forming the Hessian matrix.
-Following the results from  \cite{martens2015optimizing}, we get
+Following the results from  \cite{BEKAS20071214}, we get
 \begin{equation}
     D = \text{diag}(H) = \mathbb{E}[z \odot (Hz)].
 \end{equation}
@@ -738,6 +738,7 @@ Therefore, we apply the scalar product with $s_t^T$ to weaken the condition. Thi
 This optimization problem can be solved by an approach first proposed in \cite{Zhu1999TheQR},
 where the norm in \ref{eq:weak-secant-eq} is interpreted as the Frobenius norm.
 \begin{equation}
+    \label{eq:apollo-update}
     \Lambda= \mathbf{B}_{t+1} - \mathbf{B}_t = \frac{s_t^T y_t - s_t^T \mathbf{B}_t s_t}{\|s_t\|_4^4} \text{Diag}(s_t^2)
 \end{equation}
 here $s_t^2$ is the element-wise square vector of $s_t$, and $\text{Diag}(s_t^2)$ is the diagonal matrix with diagonal elements from vector $s_t^2$, and $\|\cdot\|_4$ is the 4-norm of a vector \cite{apollo}.

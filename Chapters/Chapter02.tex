@@ -23,7 +23,7 @@ To efficiently evaluate the optimizers across various datasets with a range of h
 we developed a comprehensive benchmarking framework in Python 3.6.8.
 The code for this framework is publicly accessible on our GitHub repository\footnote{\url{https://github.com/Neural-Opt/second_order_optim_models}}.
 and is available for anyone to use and modify. The core of our framework is built on
-\emph{PyTorch}\cite{Paszke2019}. \emph{PyTorch} is a popular open-source machine learning framework known for its dynamic computation graph and easy to integrate GPU acceleration.
+\emph{PyTorch}. \emph{PyTorch} is a popular open-source machine learning framework known for its dynamic computation graph and easy to integrate GPU acceleration.
 For datasets and pre-built computer vision model architectures, we utilized the PyTorch-associated \emph{torchvision} module.
 Additionally, \emph{NumPy} is used in some of the utility functions and to prepare data for use with \emph{matplotlib}.
 From the hardware side, most of the experiments, unless otherwise specified, were conducted on \emph{Nvidia A40} GPUs.
@@ -133,6 +133,7 @@ an additional constraint to the optimizer. This technique aids in regularization
 though it can sometimes result in slower convergence.
 To ensure fairness in our comparison, we applied the same learning rate and weight decay across all optimizers,
 which are listed in \ref{tab:cifar-real-comp}.
+
 Examining the results presented in Figure~\ref{fig:cifar-10-milestone-real}, which utilizes milestone
 learning rate decay, we observe several key findings. \emph{AdamW} and \emph{AdaBelief} converge the fastest with the best generalization.
 Although not optimally tuned, \emph{Apollo(W)} shows reasonable convergence and generalization,
