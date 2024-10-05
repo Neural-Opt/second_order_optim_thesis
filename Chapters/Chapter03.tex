@@ -22,7 +22,7 @@ To do so, we first calculate the Hessian diagonal for the current batch using \t
 Since PyTorch does not natively support the calculation of the Hessian diagonal in a fully vectorized form,
 we implemented this by iterating over each gradient element, performing a second backward pass, and extracting the corresponding second-order derivative.
 Given that this process is inherently slow, we limited our investigation to a relatively small CNN model with 13.5K parameters, consisting of two convolutional layers and two fully connected layers.
-For training, we used the MNIST dataset, which contains 60,000 images of handwritten digits, each of size 32 $\times$ 32.
+For training, we used the MNIST dataset, which contains 60,000 images of handwritten digits, each of size 28 $\times$ 28.
 To measure the similarity between the approximated Hessian diagonal and the actual batch Hessian diagonal, we needed a metric that is independent of the magnitude of the vectors.
 This is crucial because the scale of the second moments can be adjusted through the learning rate.
 Therefore, we utilized the cosine similarity measure, which is defined as follows:
@@ -133,9 +133,7 @@ the more similar \emph{Apollo}'s update step becomes to plain \emph{SGD} with mo
 This phenomenon occurred in Figure \ref{fig:cosine-big-batch}, where most values of $B$ were much smaller than the chosen $\sigma$,
 leading to a loss of curvature information.
 Note that in the standard implementation of \emph{Apollo}, $\sigma$ cannot be choosen as a hyperparamter, as it is hardcoded in the optimizer.
-
-\comment{Therefore we can formulate a condition,which all clamped values of
-$B_t$ will satisfy, with
+To gain intuition for the small values of $B$ from a theoretical perspective, we will again formulate the update rule of $B$, with
 \begin{align}
     &B_{t+1} =  B_t - \frac{d_t^T (\Delta m_{t+1}) - (d_t^2)^T B_t}{\left( \|d_t\|_4 + \epsilon \right)^4} \cdot d_t^2 \\
     &= B_t - \frac{\sum^n_j{d_{t,j}\Delta m_{t+1,j} - \sum^n_j{d_{t,j}^2 B_{t,j} }}}{\left( \|d_t\|_4 + \epsilon \right)^4} \cdot d_t^2.
@@ -143,14 +141,16 @@ $B_t$ will satisfy, with
 We now substitute $d_t = \frac{m_t}{\gamma}, \quad \gamma = \max(|B_t|, \sigma)$, and obtain the following for the $k$-th entry of $B_t$
 \begin{align*}
     \Delta B_{t+1,k} &=\left(-\displaystyle\sum^n_j \frac{m_{t,j}}{\gamma_j } \Delta m_{t+1,j} - \displaystyle\sum^n_j \frac{m_{t,j}^2}{\gamma_j ^2} B_{t,j}\right) \cdot \frac{m_{t,k}^2}{\gamma_k^2} \left( \|\frac{m_t}{\gamma}\|_4 + \epsilon \right)^{-4}  \\
-    &= \left(-\displaystyle\sum^n_j \frac{m_{t,j}\Delta m_{t+1,j}m_{t,k}^2}{\gamma_j \gamma_k^2} - \frac{m_{t,j}^2m_{t,k}^2}{\gamma_j ^2\gamma_k^2} B_{t,j}\right) \left( \|\frac{m_t}{\gamma}\|_4 + \epsilon \right)^{-4}.  \\
-    &\leq \left(-\displaystyle\sum^n_j \frac{m_{t,j}\Delta m_{t+1,j}m_{t,k}^2}{\gamma_j \gamma_k^2} - \frac{m_{t,j}^2m_{t,k}^2}{\gamma_j ^2\gamma_k^2} B_{t,j}\right) \left(\left( \|\frac{m_t}{\gamma}\|_4\right)^{-4} + \left(\epsilon \right)^{-4}\right) \\
-    &=  \Delta \hat{B_{t+1,k}}
+    &= \left(-\displaystyle\sum^n_j \frac{m_{t,j}\Delta m_{t+1,j}m_{t,k}^2}{\gamma_j \gamma_k^2} - \frac{m_{t,j}^2m_{t,k}^2}{\gamma_j ^2\gamma_k^2} B_{t,j}\right) \left( \|\frac{m_t}{\gamma}\|_4 + \epsilon \right)^{-4}  \\
+    &\approx \left(-\displaystyle\sum^n_j \frac{m_{t,j}\Delta m_{t+1,j}m_{t,k}^2}{\gamma_j \gamma_k^2} - \frac{m_{t,j}^2m_{t,k}^2}{\gamma_j ^2\gamma_k^2} B_{t,j}\right) \left( \|\frac{m_t}{\gamma}\|_4\right)^{-4}  \\
+    &=  \Delta \hat{B}_{t+1,k}.
 \end{align*}
-We will noew look at the state of the algorithm \emph{after} the first iteration. As $B_1 = 0$, $\gamma = \sigma$, therefore
+We will now examine the state of the algorithm in a situation where $B_t$ is small, to observe how the updates behave in such a case.
+Specifically, we consider $B_{t,k} \leq \sigma$, and thus set $\gamma = \sigma$, which gives us the following expression
+
 \begin{align*}
-    \Delta \hat{B}_{2,k} &\approx \left(-\sum_{j=1}^{n} \frac{m_{t,j} \Delta m_{t+1,j} m_{t,k}^2}{\sigma^3}  \right) \sigma^{-4} \left(\sum_{j=1}^{n} m_{t,j}^{4} \right)^{-1}\\
-    &=  \left(-\sum_{j=1}^{n} \sigma m_{t,j} \Delta m_{t+1,j} m_{t,k}^2\right)  \left(\sum_{j=1}^{n} m_{t,j}^{4} \right)^{-1}
+    \Delta \hat{B}_{t+1,k} &\approx \left(-\sum_{j=1}^{n} \frac{m_{t,j} \Delta m_{t+1,j} m_{t,k}^2}{\sigma^3}  - \frac{m_{t,j}^2m_{t,k}^2}{\sigma^4} B_{t,j}  \right) \sigma^{-4} \left(\sum_{j=1}^{n} m_{t,j}^{4} \right)^{-1}\\
+    &=  \left(-\sum_{j=1}^{n} \sigma m_{t,j} \Delta m_{t+1,j} m_{t,k}^2  - m_{t,j}^2m_{t,k}^2 B_{t,j} \right)  \left(\sum_{j=1}^{n} m_{t,j}^{4} \right)^{-1}.
 \end{align*}
 We observe that, the updates to $B$ can become very small when
 the absolute value of the gradient is less than 1. In neural network training, especially in deeper architectures,
@@ -163,7 +163,7 @@ which is also a small value in such cases, the application of $\epsilon$ typical
 This leads to very small updates to $B$. Due to the stochastic nature of the gradient, where the sign of the updates can flip from batch to batch,
 $B$ is unable to accumulate large values. Therefore, the values of $B$ remain small and are subsequently clamped to $\sigma$ before gradient preconditioning,
 causing the loss of all curvature information in the process.
-}
+
 As mentioned earlier, there are also multiple issues in the implementation of \emph{Apollo} (see \ref{fig:apollo_imp}),
 which deviate from its theoretical formulation. In line \textbf{5}, we see the implementation of $\Delta m_{t+1}$.
 However, \texttt{delta\_grad} is not the true difference between the current and previous gradient,
@@ -205,23 +205,30 @@ p.add_(d_p, alpha=-curr_lr)
     \end{figure}
     To address the identified issues, we propose a modified version of the Apollo optimizer, named \emph{SApollo (Smoothed Apollo)}, which adheres to its theoretical formulation. Additionally, we incorporate an Exponential Moving Average (EMA) of the Hessian diagonal approximations, denoted as $B$, as suggested by the authors of \emph{Apollo} as an interesting direction for future research \cite{apollo}.
     Figure \ref{fig:sapollo_imp} illustrates our implementation. We calculate \texttt{exp\_avg\_grad} as a properly implemented EMA of the gradient and use it in the preconditioning step.
-    Furthermore, we calculate \texttt{delta\_grad}, by capturing the difference between the current and previous gradient values.
+    Furthermore, we calculate \texttt{delta\_grad}, by capturing the difference between the current gradient and it's EMA, similar to AdaBelief (see \ref{sec:adabelief}).
     The Hessian diagonal approximation $B$ is implemented as a moving average of the updates derived from Eq. \ref{eq:apollo-update}.
+    Note that this does not require additional memory, as we simply replace the non-EMA version with the EMA version of $B$.
     As we identified the clamping operation to be problematic for small values, we instead add $\sigma$ to the absolute values of $B$ (line \textbf{21}) if they are smaller than $\sigma$.
     Although this can lead to a learning rate decrease of at most twice the amount of \emph{Apollo}, it is able to capture
-    important curvature information. To tune $\sigma$ in practice, \emph{SApollo} introduces $\sigma$ as a hyperparameter.
-    Since \emph{Apollo} does not implement $\sigma$ as a hyperparameter, for a fair comparison, we use the same hyperparameters and  value for $\sigma$ (0.01) in \emph{SApollo}, even though smaller values might lead to a more accurate Hessian approximation.
-    Figure \ref{fig:sapollo-approx-weights} shows the results of the Hessian approximation. 
-    While \emph{SApollo} is not yet competitive with first-order methods, it is on par or performs better than \emph{Apollo} especially in later layers.
-    We hypothesize that decreasing the value of $\sigma$ could further improve the quality of the Hessian approximation, as $\sigma=0.01$ may be too large,
+    important curvature information. To tune $\sigma$ in practice, \emph{SApollo} introduces $\sigma$ as a hyperparameter, contrary to Apollo,
+    where $\sigma$ is hardcoded in the optimizer.
+    As we observed that the updates of $B$ can become very small, a high $\sigma$ may therefore lead to poor Hessian approximations.
+    In our performance evaluation, we use $\sigma = 0.0001$ (lr=0.001), while for the task of Hessian approximation, we use $\sigma = 0.01$ for optimal comparability with \emph{Apollo}.
+    It still needs to be determined how low the value of $\sigma$ should optimally be in practice.
+    As this might vary across different model architectures, we believe introducing $\sigma$ as a hyperparameter is a good choice.
+    Figure \ref{fig:sapollo-approx-weights} shows the results of the Hessian approximation. Note that these results only show the
+    approximation quality regarding the \emph{weights}, for the \emph{biases} we refer to \ref{fig:sappolo-cosine-bias-small-batch}.
+    While \emph{SApollo} is not yet competitive with first-order methods, it is on par or performs slightly better than \emph{Apollo} especially in later layers.
+    As said earlier, we hypothesize that decreasing the value of $\sigma$ could further improve the quality of the Hessian approximation, as $\sigma=0.01$ may be too large,
     making it an interesting direction for future research.
-    If confirmed, this would justify introducing $\sigma$ as a tunable hyperparameter.
-    In Figure \ref{fig:sapollo-perf}, we present the performance comparison between \emph{SApollo} and the other optimizers.
-    The figure illustrates that \emph{SApollo} decreases the loss faster than both \emph{ApolloW} and \emph{Apollo}. This advantage is particularly pronounced in the later stages of training, which may be attributed to a stronger learning rate decrease due to the unclamped values of $\lvert B \rvert$.
-    Although \emph{SApollo} performs better on this dataset, more extensive testing is required to conclusively determine its superiority in practice.
-    Additionally, it should be noted that storing the EMA of $B$ and the past gradient significantly increases \emph{SApollo}'s resource consumption.
-    One potential approach could be to use the EMA of past gradients for a \emph{belief}-like term (see \ref{sec:adabelief}) instead of the past gradient.
-    However, whether \emph{SApollo} could then demonstrate superiority in both Hessian approximation quality and training convergence remains a topic for future investigation.
+    In Figure \ref{fig:sapollo-perf}, we present the performance comparison between \emph{SApollo} and  \emph{Apollo(W)}.
+    The figure illustrates that \emph{SApollo} decreases the loss much faster than both \emph{ApolloW} and \emph{Apollo}.
+    Although \emph{SApollo} performs better with $\sigma = 0.0001$ on this dataset, it remains to be determined whether this improvement can solely
+    be attributed to the correction of the mentioned implementation mistakes,
+    or if \emph{Apollo(W)} would perform on par with or better than \emph{SApollo} when its $\sigma$ is set to similar values.
+    Additionally, since \texttt{d\_p} solely relies on values that are already stored, one could consider recomputing it at the start of each iteration
+    using the not yet updated values of \texttt{exp\_avg\_grad} and $B$.
+    This would reduce \emph{(S)Apollo}'s memory requirements to those of popular first-order methods, such as \emph{Adam}.
 
 
     \begin{figure}[H]
@@ -231,7 +238,7 @@ p.add_(d_p, alpha=-curr_lr)
     bias_correction2 = 1 - beta2 ** state['step']
 
     # calc the diff grad
-    delta_grad = grad - state['old_grad']
+    delta_grad = grad - (exp_avg_grad/bias_correction1)
     sigma = 0.01
     # Update the running average grad
     exp_avg_grad.mul_(beta1).add_(grad, alpha=1 - beta1)
@@ -252,34 +259,35 @@ p.add_(d_p, alpha=-curr_lr)
     # Perform step weight decay
     (...)
     p.add_(d_p, alpha=-curr_lr)
-    state['old_grad'] = grad.clone().detach()
     \end{minted}
         \caption{The implementation of \emph{SApollo} in PyTorch}
         \label{fig:sapollo_imp}
     
         \end{figure}
     
-
         \begin{figure}[h!]
             \centering
-            \begin{tabular}{cc}
-                \input{assets/chap3/sapollo-approx-weights.tex} \\ % Replace with the correct path to your .tex file
-            \end{tabular}
-            \caption{The cosine similarity (in degrees), y-axis, between the calculated batch Hessian diagonal and the corresponding optimizer approximations on a \emph{small} batch (124 samples).
-            Optimizer updates are denoted on the x-axis.
-            Note that these results represent only the Hessian diagonals for the network's \emph{weights}. For the corresponding analysis on biases, please refer to Figure \ref{fig:sappolo-cosine-bias-small-batch}.
-        }
-            \label{fig:sapollo-approx-weights}
+         \begin{minipage}[b]{\textwidth}
+                \centering
+                \begin{tabular}{cc}
+                    \input{assets/chap3/sapollo-approx-weights.tex} % Pfad zu deiner .tex-Datei
+                \end{tabular}
+                \caption{
+                    The cosine similarity (in degrees), y-axis, between the calculated batch Hessian diagonal and the corresponding optimizer approximations on a \emph{small} batch (124 samples).
+                    Optimizer updates are denoted on the x-axis.
+                }
+                \label{fig:sapollo-approx-weights}
+            \end{minipage}
+            \vfill
+            \begin{minipage}[b]{\textwidth}
+                \centering
+                \begin{tabular}{cc}
+                    \input{assets/chap3/sapollo-perf.tex} % Pfad zu deiner .tex-Datei
+                \end{tabular}
+                \caption{
+                    Evaluation of \emph{SApollo} on CIFAR-10 using ResNet-110 with the \emph{cosine annealing} learning rate scheduler.
+                }
+                \label{fig:sapollo-perf}
+            \end{minipage}
         \end{figure}
-
-        \begin{figure}[h!]
-            \centering
-            \begin{tabular}{cc}
-                \input{assets/chap3/sapollo-perf.tex} \\ % Replace with the correct path to your .tex file
-            \end{tabular}
-            \caption{
-               Evaluation of \emph{SApollo} on CIFAR-10 using ResNet-110 with the \emph{cosine annealing} learning rate scheduler. For better visualization we applied a polynomial transformation, with $\hat{x}=x^\alpha$ and $\alpha=5$, for every $x \in \mathcal{D}$ in the output data $ \mathcal{D}$. 
-        }
-        \label{fig:sapollo-perf}
-
-        \end{figure}
+        

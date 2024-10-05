@@ -709,7 +709,7 @@ closest matrix to $\mathbf{B}$ under the condition of the \emph{strong secant eq
 Therefore, our algorithm for updating
 the Hessian approximation $\mathbf{B}$ will now be 
 \begin{equation}
-    \mathbf{B}_{t+1} = argmin_{\mathbf{B}} \|\mathbf{B} - \mathbf{B}_t\|,\\
+    \mathbf{B}_{t+1} = argmin_{\mathbf{B}} \|\mathbf{B} - \mathbf{B}_t\|_F,\\
     \text{s.t. }  \mathbf{B}_{t+1}\mathbf{s}_t = \mathbf{y}_t.
 \end{equation}
 This optimization problem forms the foundation for a family of quasi-Newton algorithms
@@ -837,7 +837,7 @@ where:
     \item \( b^{(l)} \) is the bias vector of layer \( l \).
 \end{itemize}
 As we can see, the formulation follows the same principle as a single neuron but now in a vectorized form. 
-\( \mathbf{\theta}^{(l)}  \) is a weight matrix of size \( n \times m \), where \( m \) is the number of inputs to a single neuron of the next layer and \( n \) is the number of neurons in a single layer.
+\( \theta^{(l)}  \) is a weight matrix of size \( n \times m \), where \( m \) is the number of inputs to a single neuron of the next layer and \( n \) is the number of neurons in a single layer.
 \( \mathbf{x}^{(l-1)} \) is the output vector from the previous layer.
 From their matrix-vector product, we get the pre-activations for each layer in vectorized form.
 This vector is then fed into a non-linear activation function, whose output is then fed into the next layer.
@@ -930,10 +930,11 @@ $\delta^{M} = \frac{\partial L}{\partial z^{(M)}} = \frac{\partial L}{\partial \
 We then loop back to the first layer with \(0 \leq m < M\) and calculate the respective gradients of the current layer using the gradient information from the previous layer. For that, we set
 \begin{align}
     \delta^{(m)} &= \frac{\partial L}{\partial z^{(m)}} \\
-                 &= \left[ \frac{\partial L}{\partial z^{(m+1)}} \frac{\partial z^{(m+1)}}{\partial \hat{y}^{(m)}} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
-                 &= \left[ \delta^{(m+1)} \frac{\partial z^{(m+1)}}{\partial \hat{y}^{(m)}} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
-                 &= \left[\delta^{(m+1)} \theta^{(m+1)}  \right] \odot \nabla_{z^{(m)}} f.
+                 &= \left[  \frac{\partial \hat{y}^{(m+1)}}{\partial z^{(m)}} \frac{\partial L}{\partial z^{(m+1)}} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
+                 &= \left[ \frac{\partial \hat{y}^{(m+1)}}{\partial z^{(m)}}  \delta^{(m+1)} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
+                 &= \left[ \theta^{(m+1)^T} \delta^{(m+1)}  \right] \odot \nabla_{z^{(m)}} f.
 \end{align}
+
 Here, $\odot$ denotes the element-wise (Hadamard) product.
 To calculate the gradient information for the $i$-th the parameter of a neuron $j$ in layer $m$, we set
 \begin{align}
@@ -960,7 +961,7 @@ Algorithm \ref{alg:backprop} provides an overview of the backpropagation algorit
             \State \textbf{Backward Pass:}
             \State Compute $\delta^{M} = \frac{\partial L}{\partial z^{(M)}} = \frac{\partial L}{\partial \hat{y}^{(M)}} \odot \frac{\partial \hat{y}^{(M)}}{\partial z^{(M)}}$
             \For{$m = M-1$ \textbf{to} $0$}
-                \State Compute $\delta^{(m)} = [\delta^{(m+1)} \theta^{(m+1)}] \nabla_{z^{(m)}} f$
+                \State Compute $\delta^{(m)} = [\theta^{(m+1)^T}\delta^{(m+1)}] \nabla_{z^{(m)}} f$
                 \State Compute gradients:
                 \State $\frac{\partial L}{\partial \theta_{i,j}^{(m)}} = \delta^{(m)}_j \odot \hat{y}_i^{(m-1)}$
                 \State $\frac{\partial L}{\partial b_j^{(m)}} = \delta_j^{(m)}$
@@ -1071,7 +1072,7 @@ avoiding interference with the adaptive nature of the gradient updates, where we
 amount than other weights. \cite{Loshchilov2017FixingWD}.
 
 
-\subsection{Exact Calculation of the Hessian Matrix for MLPs}
+\subsection{Exact Calculation of the Hessian Matrix for MLPs \cite{Bishop1992}}
 \label{sec:hessian_exact}
 
 In this section we will discuss how we can calculate the exact Hessian of a Loss using the backpropagation
@@ -1095,7 +1096,7 @@ E = \sum_p E_p,
 
 where \(p\) labels the data point. We now consider a simple feedforward architecture without skip
 or feedback connections. Without loss of generality, we assume that unit \(i\) is in the same layer
-as unit \(n\), or in a lower layer. Due to the symmetry of the Hessian (see \ref{}), the remaining 
+as unit \(n\), or in a lower layer. Due to the symmetry of the Hessian (see \ref{sec:hessian}), the remaining 
 terms do not have to be computed. Utilizing the chain rule, we can can formulate this as
 \begin{align}
 \frac{\partial^2 E_p}{\partial \theta_{ij} \partial \theta_{nl}} = \frac{\partial z_i}{\partial \theta_{ij}} \frac{\partial}{\partial z_i} \left( \frac{\partial E_p}{\partial \theta_{nl}} \right) = a_j \frac{\partial}{\partial z_i} \left( \frac{\partial E_p}{\partial \theta_{nl}} \right).
@@ -1127,7 +1128,6 @@ Using the chain rule for partial derivatives we can evaluate the \( g_{li} \) as
 g_{li} = \sum_r \frac{\partial z_l}{\partial z_r} \frac{\partial z_r}{\partial z_i} ,
 \end{align}
 where the sum runs over all units \( r \) which send connections to unit \( l \). The above equation can be recursivly defined as
-\marginpar{\cite{Bishop1992}}
 \begin{align}
 g_{li} = \sum_r f'(z_r) \theta_{rl} g_{ri},
 \end{align}
@@ -1173,10 +1173,9 @@ To summarize this process, for each pattern or data point \( p \):
     \item Execute back-propagation to determine \( \sigma_n \) and \( b_{ni} \).
     \item Finally, evaluate the value of \(\frac{\partial^2 E_p}{\partial \theta_{ij} \partial \theta_{nl}}\) using the determinded values.
 \end{enumerate}
-\marginpar{\cite{Bishop1992}}
 
 The total number of distinct forward and backward propagations required per training pattern is equal to twice the number of hidden and output units in the network.
-The number of operations for each propagation scales with \(N\), where \(N\) is the total number of weights in the network.
+The number of operations for each propagation scales with \(N\), where \(N\) is the total number of weights in the network\cite{Bishop1992}.
 
 
 
