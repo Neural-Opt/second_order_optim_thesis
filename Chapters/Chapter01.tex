@@ -15,7 +15,7 @@ and it quantifies how much the function changes with a small change in $ x $.
 \subsection{Derivatives for Functions of a Single Variable}
 \label{sec:derivative}
 
-Let $ f: \mathbb{R} \to \mathbb{R} $ be a single-variable function. The derivative of the function $ f $ at a point $x$ denoted as $ f'(x) $, is defined as
+Let $ f: \mathbb{R} \to \mathbb{R} $ be a single-variable function. The derivative of the function $ f $ at a point $x \in \mathbb{R}^n $ denoted as $ f'(x) $, is defined as
 \begin{align}
     f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} \quad h \in \mathbb{R}.
 \end{align}
@@ -24,7 +24,7 @@ Let $ f: \mathbb{R} \to \mathbb{R} $ be a single-variable function. The derivati
 
 
 Consider a function $ f: \mathbb{R}^n \to \mathbb{R} $.
-The partial derivative of $f$ with respect to the variable $ x_i $ at a point $ \mathbf{x} = (x_1, x_2, \ldots, x_n)$ is defined as
+The partial derivative of $f$ with respect to the variable $ x_i $ at a point $ \mathbf{x} = (x_1, x_2, \ldots, x_n) \in \mathbb{R}^n $ is defined as
 \begin{align}
  \frac{\partial f}{\partial x_i}(\mathbf{x}) = \lim_{h \to 0} \frac{f(x_1, \ldots, x_i+h, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}, \quad h \in \mathbb{R}.
 \end{align}
@@ -34,7 +34,7 @@ Assuming this limit exists, this definition encapsulates how $f$ responds to inf
 \subsection{The Gradient}
 \label{sec:gradient}
 
-Let \( f: \mathbb{R}^n \to \mathbb{R} \) be a function  that is differentiable at a point $ \mathbf{x} $.
+Let \( f: \mathbb{R}^n \to \mathbb{R} \) be a function  that is differentiable at a point $ \mathbf{x} \in \mathbb{R}^n  $.
 Than the gradient of $ f $ at $ \mathbf{x} \in \mathbb{R}^n$, that is denoted as $ \nabla f(\mathbf{x}) $, is the vector of all its first partial derivatives
 \begin{align}
 \nabla f(\mathbf{x}) = \left( \frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2}, \ldots, \frac{\partial f}{\partial x_n} \right) \quad \mathbf{x} \in \mathbb{R}^n.
@@ -542,7 +542,7 @@ As we need the inverse $\mathbf{C}_{k+1} := \mathbf{B}_{k+1}^{-1}$ for performin
 which is the update equation that is used in the \emph{DFP} algorithm.
 The \emph{BFGS} algorithm works very similarly, with the subtle difference that it imposes the above conditions on the inverses of the Hessian approximations, meaning we have
 \begin{equation}
-\mathbf{C}{k+1} = \min_{C} \|C - \mathbf{C}k\| \\\text{s.t. } C = C^T, \quad Cy_k = s_k
+\mathbf{C}_{k+1} = \min_{C} \|C - \mathbf{C}_k\| \\\text{s.t. } C = C^T, \quad Cy_k = s_k
 \end{equation}
 Again, \emph{BFGS} uses the Frobenius norm, which leads to the following update formulation:
 \begin{equation}
@@ -737,7 +737,7 @@ To ensure that the Hessian update remains invariant to the chosen stepsize, the 
 where \( d_t = - \frac{s_t}{\eta_t} \). The whole algorithm for \emph{Apollo} is displayed in \ref{alg:apollo}.
 Instead of working with gradients \( g_t \) directly, we choose the exponential moving average of them, in the
 same fashion as we do in the \emph{Adam} optimizer \ref{sec:adam}. Because \emph{Apollo} uses the newton-step \ref{eq:newtonstep}
-for its parameter update, we have to make sure that the approximation $ \mathbf{B}$ is non singular.
+for its parameter update, we have to make sure that the approximation $ \mathbf{B}$ is neither zero nor very small, as this would lead to arbitrary large steps.
 For that we define another diagonal matrix $ \mathbf{D_t}$ for which we choose
 \begin{equation}
     \mathbf{D_t} =  \text{rectify}(|\mathbf{B_t}|,\sigma) = \max(|\mathbf{B_t}|,\sigma), \\ |\mathbf{B_t}| = \sqrt{\mathbf{B_t}^T\mathbf{B_t}},
@@ -770,7 +770,7 @@ In practice \emph{Apollo} chooses $\sigma=0.01$.\cite{apollo}
     \end{algorithmic}
     \end{algorithm}
 
- \section{Introduction to artificial Neural Networks}
+ \section{Introduction to artificial Neural Networks \cite{GrundkursAI}}
 Biological neural networks are intricate systems of interconnected neurons that communicate with each other to process information.
 Each neuron, a specialized nerve cell, is designed to receive, process, and transmit signals through electrochemical processes.
 Around the year 1900, a groundbreaking realization emerged that these tiny physical building blocks of the brain — the nerve cells and their intricate
@@ -837,7 +837,7 @@ where:
     \item \( b^{(l)} \) is the bias vector of layer \( l \).
 \end{itemize}
 As we can see, the formulation follows the same principle as a single neuron but now in a vectorized form. 
-\( \theta^{(l)}  \) is a weight matrix of size \( n \times m \), where \( m \) is the number of inputs to a single neuron of the next layer and \( n \) is the number of neurons in a single layer.
+\( \theta^{(l)}  \) is a weight matrix of size \( n_{l} \times n_{l-1} \), where $n_{l}$ and $n_{l-1}$ are the number of neurons in layer $l$ and $l-1$ respectively.
 \( \mathbf{x}^{(l-1)} \) is the output vector from the previous layer.
 From their matrix-vector product, we get the pre-activations for each layer in vectorized form.
 This vector is then fed into a non-linear activation function, whose output is then fed into the next layer.
@@ -961,7 +961,7 @@ Algorithm \ref{alg:backprop} provides an overview of the backpropagation algorit
             \State \textbf{Backward Pass:}
             \State Compute $\delta^{M} = \frac{\partial L}{\partial z^{(M)}} = \frac{\partial L}{\partial \hat{y}^{(M)}} \odot \frac{\partial \hat{y}^{(M)}}{\partial z^{(M)}}$
             \For{$m = M-1$ \textbf{to} $0$}
-                \State Compute $\delta^{(m)} = [\theta^{(m+1)^T}\delta^{(m+1)}] \nabla_{z^{(m)}} f$
+                \State Compute $\delta^{(m)} = [\theta^{(m+1)^T}\delta^{(m+1)}] \odot \nabla_{z^{(m)}} f$
                 \State Compute gradients:
                 \State $\frac{\partial L}{\partial \theta_{i,j}^{(m)}} = \delta^{(m)}_j \odot \hat{y}_i^{(m-1)}$
                 \State $\frac{\partial L}{\partial b_j^{(m)}} = \delta_j^{(m)}$

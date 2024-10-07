@@ -127,9 +127,27 @@
         Adam        & $1 \times 10^{-2}$ & 0  & (0.9,0.999) & $1 \times 10^{-08}$   \\
         AdaBelief   & $1 \times 10^{-2}$ & 0   & (0.9,0.999) & $1 \times 10^{-08}$   \\
         Apollo      & $3 \times 10^{-3}$ (0.01)  & 0  & (0.9)  & $1 \times 10 ^{-4} $  \\
-        SApollo      & 0.01 & 0  & (0.9)  & $1 \times 10 ^{-4} $  \\
+        SApollo      & 0.01 & 0  & (0.9,0.999)  & $1 \times 10 ^{-4} $  \\
 
         AdaHessian  & $2 \times 10^{-1}$ & 0  & (0.9,0.999) &   $1 \times 10 ^{-4} $ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{Hyperparameter settings for comparison between \emph{SApollo} and \emph{Apollo}}
+    \label{tab:sapollo-comp-params}
+    \begin{tabular}{lcccccc}  % Adjust the number of 'c's depending on the number of columns
+        \toprule
+        & \textbf{Learning rate} &$\sigma$& \textbf{Weight decay} & \textbf{Beta} & \textbf{Epsilon} \\
+        \midrule
+
+        Apollo      & $0.01$   &0.01& 0.00025  & (0.9)  & $1 \times 10 ^{-4} $  \\
+        ApolloW      & $0.01$   &0.01& 0.025  & (0.9)  & $1 \times 10 ^{-4} $  \\
+        SApollo      &$0.001$ &0.0001& 0.025   & (0.9,0.999)  & $1 \times 10 ^{-8} $  \\
+        Apollo-H-LR      & $0.1$   &0.01& 0.00025  & (0.9)  & $1 \times 10 ^{-4} $  \\
+        ApolloW-H-LR    & $0.1$   &0.01& 0.025  & (0.9)  & $1 \times 10 ^{-4} $  \\
         \bottomrule
     \end{tabular}
 \end{table}

@@ -66,16 +66,11 @@ We can see that, despite tuning each optimizer for optimal performance, with Hyp
 even though it is capable of much more accurate curvature approximations. \emph{Apollo} on the other hand is 
 able to achive basicly the same convergence behavior as first-oder methods, although providing much less accurate curvature
 approaximations.
-This raises the question of whether very accurate curvature estimates might actually hinder
-the model's performance. It is conceivable that such precision could lead to an
-earlier discovery of local minima, which are suboptimal, whereas optimizers like
-\emph{Apollo} may explore more of the loss surface while still accounting for curvature.
-However, as we observed in the benchmarks on \emph{CIFAR-10} and \emph{WMT-14}, both \emph{AdaHessian} and \emph{Apollo} are able to discover minima that generalize well.
+Additionally, as we observed in the benchmarks on \emph{CIFAR-10} and \emph{WMT-14}, both \emph{AdaHessian} and \emph{Apollo} are able to discover minima that generalize well.
 This leads to the hypothesis that the better generalization performance of the tested second-order
 methods may not be solely based on superior Hessian approximation capabilities,
 but rather on other mechanisms that have yet to be uncovered.
-We will undermine this oberservation by uncovering several flaws in \emph{Apollo}, both theoretical and practical,
-including issues related to its implementation in the next section.
+We will undermine this oberservation by uncovering several flaws in \emph{Apollo}, related to its implementation in the next section.
 In conclusion, our analysis shows that \emph{Apollo} is not competitive with standard first-order methods in terms of curvature approximation ability,
 at least within the context of our small testing network.
 Furthermore, since \emph{AdaHessian} requires 2 to 3 times the memory of \emph{SGD} (see Table \ref{tab:optimizer_comparison_perf})
@@ -141,30 +136,25 @@ To gain intuition for the small values of $B$ from a theoretical perspective, we
 We now substitute $d_t = \frac{m_t}{\gamma}, \quad \gamma = \max(|B_t|, \sigma)$, and obtain the following for the $k$-th entry of $B_t$
 \begin{align*}
     \Delta B_{t+1,k} &=\left(-\displaystyle\sum^n_j \frac{m_{t,j}}{\gamma_j } \Delta m_{t+1,j} - \displaystyle\sum^n_j \frac{m_{t,j}^2}{\gamma_j ^2} B_{t,j}\right) \cdot \frac{m_{t,k}^2}{\gamma_k^2} \left( \|\frac{m_t}{\gamma}\|_4 + \epsilon \right)^{-4}  \\
-    &= \left(-\displaystyle\sum^n_j \frac{m_{t,j}\Delta m_{t+1,j}m_{t,k}^2}{\gamma_j \gamma_k^2} - \frac{m_{t,j}^2m_{t,k}^2}{\gamma_j ^2\gamma_k^2} B_{t,j}\right) \left( \|\frac{m_t}{\gamma}\|_4 + \epsilon \right)^{-4}  \\
-    &\approx \left(-\displaystyle\sum^n_j \frac{m_{t,j}\Delta m_{t+1,j}m_{t,k}^2}{\gamma_j \gamma_k^2} - \frac{m_{t,j}^2m_{t,k}^2}{\gamma_j ^2\gamma_k^2} B_{t,j}\right) \left( \|\frac{m_t}{\gamma}\|_4\right)^{-4}  \\
+    &= \left(\displaystyle\sum^n_j -\frac{m_{t,j}\Delta m_{t+1,j}m_{t,k}^2}{\gamma_j \gamma_k^2} - \frac{m_{t,j}^2m_{t,k}^2}{\gamma_j ^2\gamma_k^2} B_{t,j}\right) \left( \|\frac{m_t}{\gamma}\|_4 + \epsilon \right)^{-4}  \\
+    &\approx \left(\displaystyle\sum^n_j -\frac{m_{t,j}\Delta m_{t+1,j}m_{t,k}^2}{\gamma_j \gamma_k^2} - \frac{m_{t,j}^2m_{t,k}^2}{\gamma_j ^2\gamma_k^2} B_{t,j}\right) \left( \|\frac{m_t}{\gamma}\|_4\right)^{-4}  \\
     &=  \Delta \hat{B}_{t+1,k}.
 \end{align*}
 We will now examine the state of the algorithm in a situation where $B_t$ is small, to observe how the updates behave in such a case.
 Specifically, we consider $B_{t,k} \leq \sigma$, and thus set $\gamma = \sigma$, which gives us the following expression
 
 \begin{align*}
-    \Delta \hat{B}_{t+1,k} &\approx \left(-\sum_{j=1}^{n} \frac{m_{t,j} \Delta m_{t+1,j} m_{t,k}^2}{\sigma^3}  - \frac{m_{t,j}^2m_{t,k}^2}{\sigma^4} B_{t,j}  \right) \sigma^{-4} \left(\sum_{j=1}^{n} m_{t,j}^{4} \right)^{-1}\\
-    &=  \left(-\sum_{j=1}^{n} \sigma m_{t,j} \Delta m_{t+1,j} m_{t,k}^2  - m_{t,j}^2m_{t,k}^2 B_{t,j} \right)  \left(\sum_{j=1}^{n} m_{t,j}^{4} \right)^{-1}.
+    \Delta \hat{B}_{t+1,k} &= \left(\sum_{j=1}^{n} -\frac{m_{t,j} \Delta m_{t+1,j} m_{t,k}^2}{\sigma^3}  - \frac{m_{t,j}^2m_{t,k}^2}{\sigma^4} B_{t,j}  \right) \sigma^{-4} \left(\sum_{j=1}^{n} m_{t,j}^{4} \right)^{-1}\\
+    &=  \left(\sum_{j=1}^{n} -\sigma m_{t,j} \Delta m_{t+1,j} m_{t,k}^2  - m_{t,j}^2m_{t,k}^2 B_{t,j} \right)  \left(\sum_{j=1}^{n} m_{t,j}^{4} \right)^{-1}.
 \end{align*}
-We observe that, the updates to $B$ can become very small when
-the absolute value of the gradient is less than 1. In neural network training, especially in deeper architectures,
-the gradient is often significantly smaller than 1. This phenomenon is related to the \emph{vanishing gradient}
-problem, where gradients diminish due to repeated multiplications during backpropagation. 
+As $\Delta m_{t+1}$ is typically smaller than the gradients themselves, and when $m_{t,k} \ll m_{t,j}$, 
+the updates to $B$ can become very small. Due to the stochastic nature of the gradients,
+where the sign of updates may fluctuate from batch to batch, $B$ is unable to accumulate significant values.
+Consequently, the values of $B$ remain small and are clamped to $\sigma$ before gradient preconditioning,
+resulting in a loss of crucial curvature information.
 
 
-Although we divide by $\left(\sum_{j=1}^{n} m_{t,j}^{4} \right)$,
-which is also a small value in such cases, the application of $\epsilon$ typically occurs outside the parentheses for numerical stability reasons.
-This leads to very small updates to $B$. Due to the stochastic nature of the gradient, where the sign of the updates can flip from batch to batch,
-$B$ is unable to accumulate large values. Therefore, the values of $B$ remain small and are subsequently clamped to $\sigma$ before gradient preconditioning,
-causing the loss of all curvature information in the process.
-
-As mentioned earlier, there are also multiple issues in the implementation of \emph{Apollo} (see \ref{fig:apollo_imp}),
+As mentioned earlier, there are also multiple issues in the implementation of \emph{Apollo} (see \ref{fig:sapollo_imp}),
 which deviate from its theoretical formulation. In line \textbf{5}, we see the implementation of $\Delta m_{t+1}$.
 However, \texttt{delta\_grad} is not the true difference between the current and previous gradient,
 but rather the difference between the current gradient and \texttt{exp\_avg\_grad}, where \texttt{exp\_avg\_grad}
@@ -175,40 +165,13 @@ Furthermore, the bias correction in line \textbf{9} does not follow the standard
 We suspect that the authors may have incorrectly updated \texttt{exp\_avg\_grad} with \texttt{delta\_grad} instead of \texttt{grad},
 as doing so would align with the theoretical formulation, aside from the incorrect bias correction.
 
-\begin{figure}[H]
-\begin{minted}[linenos,frame=lines, framesep=2mm]{python}
-(...)
-bias_correction = 1 - beta ** state['step']
-alpha = (1 - beta) / bias_correction
-# calc the diff grad
-delta_grad = grad - exp_avg_grad
-rebound = 0.01
-eps = eps / rebound
-# Update the running average grad
-exp_avg_grad.add_(delta_grad, alpha=alpha)
-denom = d_p.norm(p=4).add(eps)
-d_p.div_(denom)
-v_sq = d_p.mul(d_p)
-delta = delta_grad.div_(denom).mul_(d_p).sum().mul(-alpha) 
-- B.mul(v_sq).sum()
-# Update B
-B.addcmul_(v_sq, delta)
-# calc direction of parameter updates
-denom = B.abs().clamp_(min=rebound)
-d_p.copy_(exp_avg_grad.div(denom))
-# Perform step weight decay
-(...)
-p.add_(d_p, alpha=-curr_lr)
-\end{minted}
-    \caption{The implementation of \emph{Apollo} in PyTorch}
-    \label{fig:apollo_imp}
-    \end{figure}
     To address the identified issues, we propose a modified version of the Apollo optimizer, named \emph{SApollo (Smoothed Apollo)}, which adheres to its theoretical formulation. Additionally, we incorporate an Exponential Moving Average (EMA) of the Hessian diagonal approximations, denoted as $B$, as suggested by the authors of \emph{Apollo} as an interesting direction for future research \cite{apollo}.
     Figure \ref{fig:sapollo_imp} illustrates our implementation. We calculate \texttt{exp\_avg\_grad} as a properly implemented EMA of the gradient and use it in the preconditioning step.
     Furthermore, we calculate \texttt{delta\_grad}, by capturing the difference between the current gradient and it's EMA, similar to AdaBelief (see \ref{sec:adabelief}).
     The Hessian diagonal approximation $B$ is implemented as a moving average of the updates derived from Eq. \ref{eq:apollo-update}.
     Note that this does not require additional memory, as we simply replace the non-EMA version with the EMA version of $B$.
     As we identified the clamping operation to be problematic for small values, we instead add $\sigma$ to the absolute values of $B$ (line \textbf{21}) if they are smaller than $\sigma$.
+    This means we are using $\sigma$ as a dampening factor when values of $B$ are very small.
     Although this can lead to a learning rate decrease of at most twice the amount of \emph{Apollo}, it is able to capture
     important curvature information. To tune $\sigma$ in practice, \emph{SApollo} introduces $\sigma$ as a hyperparameter, contrary to Apollo,
     where $\sigma$ is hardcoded in the optimizer.
@@ -226,13 +189,23 @@ p.add_(d_p, alpha=-curr_lr)
     Although \emph{SApollo} performs better with $\sigma = 0.0001$ on this dataset, it remains to be determined whether this improvement can solely
     be attributed to the correction of the mentioned implementation mistakes,
     or if \emph{Apollo(W)} would perform on par with or better than \emph{SApollo} when its $\sigma$ is set to similar values.
-    Additionally, since \texttt{d\_p} solely relies on values that are already stored, one could consider recomputing it at the start of each iteration
+    Furthermore, as \emph{Apollo} \cite{apollo} states, the reason for not introducing $\sigma$ as a hyperparameter is that the learning rate and $\sigma$ are coupled.
+    This means that if the ratio between the learning rate and $\sigma$ remains the same across runs, the optimization trajectory shall also be the same (see Theorem 1 \cite{apollo}). 
+    To test this in practice,
+    we chose \texttt{lr}$=10^{-3}$ and $\sigma=10^{-4}$ for \emph{SApolloW} and applied the same ratio of \texttt{lr} and $\sigma$ to \emph{Apollo(W)}. Since $\frac{10^{-3}}{10^{-4}}=10$, we set \texttt{lr}$=0.1$ for \emph{Apollo(W)},
+    as $\frac{10^{-3}}{10^{-4}}=10=\frac{10^{-1}}{10^{-2}}$ (see \ref{tab:sapollo-comp-params}). In our plot, we refer to these results as \emph{Apollo(W)-H-LR}.
+    As we can see, the performance of \emph{Apollo(W)-H-LR} is significantly worse when compared to the other versions of the optimizer. 
+    This indicates that the coupling of \texttt{lr} and $\sigma$ does not hold in practice, as the optimization trajectory between \emph{Apollo(W)} and \emph{Apollo(W)-H-LR} is \emph{not} the same,
+    emphasizing the need to introduce $\sigma$ as a hyperparameter.
+
+    Regarding memory optimization, since \texttt{d\_p} solely relies on values that are already stored, one could consider recomputing it at the start of each iteration
     using the not yet updated values of \texttt{exp\_avg\_grad} and $B$.
-    This would reduce \emph{(S)Apollo}'s memory requirements to those of popular first-order methods, such as \emph{Adam}.
+    This would reduce \emph{(S)Apollo}'s memory requirements to those of popular first-order methods, such as \emph{Adam}, which would 
+    make it interesting for future investigation.
 
-
+    \FloatBarrier
     \begin{figure}[H]
-     \begin{minted}[linenos,frame=lines, framesep=2mm]{python}
+     \begin{minted}[linenos,frame=lines, framesep=2mm,breaklines, breakanywhere]{python}
     (...)
     bias_correction1 = 1 - beta1 ** state['step']
     bias_correction2 = 1 - beta2 ** state['step']
@@ -260,10 +233,37 @@ p.add_(d_p, alpha=-curr_lr)
     (...)
     p.add_(d_p, alpha=-curr_lr)
     \end{minted}
-        \caption{The implementation of \emph{SApollo} in PyTorch}
+    \begin{minted}[linenos,frame=lines, framesep=2mm,breaklines, breakanywhere]{python}
+        (...)
+        bias_correction = 1 - beta ** state['step']
+        alpha = (1 - beta) / bias_correction
+        # calc the diff grad
+        delta_grad = grad - exp_avg_grad
+        rebound = 0.01
+        eps = eps / rebound
+        # Update the running average grad
+        exp_avg_grad.add_(delta_grad, alpha=alpha)
+        denom = d_p.norm(p=4).add(eps)
+        d_p.div_(denom)
+        v_sq = d_p.mul(d_p)
+        delta = delta_grad.div_(denom).mul_(d_p).sum().mul(-alpha) 
+        - B.mul(v_sq).sum()
+        # Update B
+        B.addcmul_(v_sq, delta)
+        # calc direction of parameter updates
+        denom = B.abs().clamp_(min=rebound)
+        d_p.copy_(exp_avg_grad.div(denom))
+        # Perform step weight decay
+        (...)
+        p.add_(d_p, alpha=-curr_lr)
+        \end{minted}
+
+    
+        \caption{The implementation of \emph{SApollo}(top) and  \emph{Apollo}(bottom) in PyTorch}
         \label{fig:sapollo_imp}
     
         \end{figure}
+        \FloatBarrier
     
         \begin{figure}[h!]
             \centering

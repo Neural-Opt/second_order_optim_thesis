@@ -12,10 +12,13 @@ Furthermore, we identified several implementation flaws in \emph{Apollo}, which 
 In addition to fixing these issues, \emph{SApollo} introduces a smoothed version of the Hessian approximation,
 $B$, to reduce the influence of stochastic noise. Instead of clamping values below $\sigma$, \emph{SApollo} adds $\sigma$ to approximations
 that fall below this threshold, ensuring that small approximation information is retained.
-This approach led to improved Hessian approximation accuracy and better convergence performance on the \emph{CIFAR-10} dataset.
-We hypothesize that using smaller values for $\sigma$, in the range of $[10^{-3}, 10^{-4}, 10^{-5}]$,
-could lead to significantly better performance.
-The value $\sigma = 0.01$, which Apollo uses, is relatively large when compared to the typical magnitude of gradients,
-which are often much smaller, especially when training deep networks like \emph{ResNet}.
-By introducing $\sigma$ as a tunable hyperparameter in \emph{SApollo}, fine-tuning it could be an interesting direction for future research.
+Although this approach led to slightly improved Hessian approximation accuracy and better convergence performance
+on the \emph{CIFAR-10} dataset, it remains to be determined whether these performance benefits can be
+solely attributed to the correction of implementation errors in \emph{Apollo}, or if assigning similarly small values
+for $\sigma$—which is not tunable as a hyperparameter in \emph{Apollo}—could yield the same or even better performance.
+Furthermore, we determined that the coupling between the learning rate and $\sigma$ does not hold in practice.
+This means that we cannot adjust the influence of $\sigma$ by simply tuning the learning rate in \emph{Apollo},
+making the introduction of $\sigma$ as a hyperparameter a necessity.
+
+
 
