@@ -188,7 +188,7 @@ Let \( \mathcal{L} : \mathbb{R}^d \to \mathbb{R} \) be a differentiable function
 Let \( \theta_0 \in \mathbb{R}^d \) and \( \gamma > 0 \) be a step size.  
 \emph{The Gradient Descent (GD)} algorithm defines a sequence \( (\theta_t)_{t \in \mathbb{N}} \) satisfying:
 \begin{align}
-\theta_{t+1} = \theta_t - \gamma \nabla \mathcal{L}(x_t).
+\theta_{t+1} = \theta_t - \gamma \nabla_{\theta} \mathcal{L}(\theta_t).
 \end{align}
 The step size, denoted as $\gamma$, is often called the \emph{learning rate} and is a crucial hyperparameter when training a model.
 An incorrect choice of $\gamma$ can yield significantly different outcomes: if too large, the step size may overshoot the minimum, resulting in oscillation or divergence;
@@ -463,7 +463,7 @@ where $I$ is the identity matrix, $\alpha$ is the strong convexity parameter
 and $\beta$ is the strict smoothness parameter (satisfying $\exists \beta > 0 : \nabla^2 f(\theta) \preceq \beta I, \quad \forall \theta \in \mathbb{R}^d$) \cite{convexity_smoothness}.
 While $\preceq$ denotes the positive semidefinite ordering of matrices (see \ref{sec:matrix_definiteness}).\\
 Now define a function $\lambda(\theta_t) = \left( g_t^T \mathbf{H}_t^{-1} g_t \right)^{1/2}$ and $
-\Delta \theta = \mathbf{H}^{-1}g_t$.
+\Delta \theta = \mathbf{H}^{-1}g_t$, where $g_t$ is the gradient at step $t$.
 Given the $\beta$-smoothness property of $f$, we can infer that 
 \begin{align}
     \begin{split}
@@ -926,12 +926,12 @@ Before applying the backpropagation algorithm, we first have to evaluate all the
 This process is often called the forward pass.
 After computing the loss \(L\), we calculate the gradient of \(L\) with respect to the pre-activations of the model output, which we denote as
 $\delta^{M} = \frac{\partial L}{\partial z^{(M)}} = \frac{\partial L}{\partial \hat{y}^{(M)}} \cdot \frac{\partial \hat{y}^{(M)}}{\partial z^{(M)}}$
-, where \(z^{(M)} = \theta^{(M)} x^{(M-1)} + b^{(M)}\) and \(\hat{y} = f(z^{(M)})\), with \(M\) being the last layer.
+, where \(z^{(M)} = \theta^{(M)} x^{(M-1)} + b^{(M)}\) and \(\hat{y}^{(M)} = f(z^{(M)})\), with \(M\) being the last layer.
 We then loop back to the first layer with \(0 \leq m < M\) and calculate the respective gradients of the current layer using the gradient information from the previous layer. For that, we set
 \begin{align}
     \delta^{(m)} &= \frac{\partial L}{\partial z^{(m)}} \\
-                 &= \left[  \frac{\partial \hat{y}^{(m+1)}}{\partial z^{(m)}} \frac{\partial L}{\partial z^{(m+1)}} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
-                 &= \left[ \frac{\partial \hat{y}^{(m+1)}}{\partial z^{(m)}}  \delta^{(m+1)} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
+                 &= \left[  \frac{\partial z^{(m+1)}}{\partial \hat{y}^{(m)}} \frac{\partial L}{\partial z^{(m+1)}} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
+                 &= \left[ \frac{\partial z^{(m+1)}}{\partial \hat{y}^{(m)}}  \delta^{(m+1)} \right] \odot \frac{\partial \hat{y}^{(m)}}{\partial z^{(m)}} \\
                  &= \left[ \theta^{(m+1)^T} \delta^{(m+1)}  \right] \odot \nabla_{z^{(m)}} f.
 \end{align}
 
