@@ -401,13 +401,13 @@ Suppose \( f: \mathbb{R}^n \to \mathbb{R} \) is continuously differentiable and 
 that
 \label{eq:taylor}
 \begin{equation}
-    f(x+\Delta x ) = f(x) + \nabla f(x)^T\Delta x  + \frac{1}{2}\Delta x ^T\nabla^2f(x)\Delta x 
+    f(x+\Delta x ) \approx f(x) + \nabla f(x)^T\Delta x  + \frac{1}{2}\Delta x ^T\nabla^2f(x)\Delta x 
 \end{equation}
 This follows from the second-order Taylor expansion with $x \in \mathbb{R}^n$ choosen as the expansion point \cite{nocedal2006numerical}.\\
 As previously mentioned, this function approximates a paraboloid. To find the minimizer of this approximation we differentiate with respect to $\Delta x $ and set the gradient to zero.
 \begin{align}
     \begin{array}{rcl}
-    \frac{d}{d\Delta x } f(x+\Delta x ) & = & \nabla f(x) + \nabla^2 f(x) \Delta x  = 0 \\
+    \frac{d}{d\Delta x } f(x+\Delta x ) & \approx & \nabla f(x) + \nabla^2 f(x) \Delta x  = 0 \\
     & \iff & \Delta x  = -(\nabla^2 f(x))^{-1} \nabla f(x)
     \end{array}
 \end{align}
